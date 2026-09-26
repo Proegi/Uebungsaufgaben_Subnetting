@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Übungsaufgaben Subnetting</title>
+<!-- Loesung: Uebungsaufgaben_Subnetting_Loesung.md -->
+<style>
+  :root{
+    --paper:#E4E6E1;
+    --card:#FAFAF8;
+    --card-2:#F1F2EE;
+    --ink:#15181B;
+    --ink-2:#5C6169;
+    --ink-3:#8A8F95;
+    --line:#C7CAC3;
+    --line-2:#DEE0DA;
+    --pink:#D6437E;
+    --ok:#1E6B4F;
+    --warn:#9E6A12;
+    --bad:#B32C22;
+    --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+    --sans:"Inter","Segoe UI",system-ui,-apple-system,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    margin:0;
+    color:var(--ink);
+    font-family:var(--sans);
+    font-size:16px;
+    line-height:1.55;
+    background:
+      repeating-linear-gradient(45deg,
+        rgba(21,24,27,.028) 0 7px,
+        rgba(21,24,27,0) 7px 15px),
+      var(--paper);
+  }
+  .sheet{max-width:980px;margin:0 auto;padding:34px 22px 40px;}
+
+  header.top{
+    background:var(--card);border:1px solid var(--ink);
+    box-shadow:5px 5px 0 rgba(21,24,27,.14);
+    padding:20px 22px;margin-bottom:34px;
+  }
+  header.top .kicker{
+    font-family:var(--mono);font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--ink-3);margin-bottom:8px;
+  }
+  header.top h1{font-size:1.6rem;font-weight:650;letter-spacing:-.015em;margin:0 0 6px;}
+  header.top p{margin:0;color:var(--ink-2);font-size:.9rem;}
+
+  section.task{
+    background:var(--card);border:1px solid var(--ink);
+    box-shadow:5px 5px 0 rgba(21,24,27,.14);
+    padding:22px 22px 26px;margin-bottom:34px;
+  }
+  .task-head{border-bottom:1px solid var(--ink);padding-bottom:10px;margin-bottom:18px;}
+  .task-head .num{
+    display:block;font-family:var(--mono);font-size:.68rem;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--pink);margin-bottom:4px;
+  }
+  .task-head h2{font-size:1.18rem;font-weight:650;margin:0;}
+
+  .info{background:var(--card-2);border:1px solid var(--line);padding:14px 16px;margin-bottom:16px;font-size:.95rem;}
+  .info p{margin:0 0 8px;}
+  .info p:last-child{margin-bottom:0;}
+
+  .demo{background:#fff;border:1px solid var(--line);padding:10px 14px;margin:10px 0 0;overflow-x:auto;}
+  .demo div{display:flex;gap:14px;align-items:baseline;white-space:nowrap;}
+  .demo span.k{
+    font-family:var(--mono);font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--ink-3);width:9.5rem;flex:0 0 auto;
+  }
+  .demo span.v{font-family:var(--mono);font-size:.92rem;}
+
+  .block{
+    border:1px solid var(--line);background:var(--card-2);padding:14px 16px;margin-bottom:16px;overflow-x:auto;
+  }
+  .block:last-child{margin-bottom:0;}
+  .block h4{
+    font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;
+    margin:0 0 10px;font-weight:700;
+  }
+  .block p{margin:0 0 10px;font-size:.93rem;}
+  .block p:last-child{margin-bottom:0;}
+  .block table.grid{margin-bottom:10px;}
+
+  table.steps{border-collapse:collapse;margin-bottom:4px;}
+  table.steps td{padding:4px 0;vertical-align:top;}
+  table.steps td.lab{font-size:.85rem;color:var(--ink-2);padding-right:20px;white-space:nowrap;}
+  table.steps td.frm{font-size:.9rem;}
+  table.steps td.frm em{font-style:normal;color:var(--ink-2);}
+  table.steps td.frm b{display:block;font-family:var(--mono);font-weight:600;font-size:.93rem;margin-top:2px;}
+  .c-pre,.c-hb,.c-m,.c-bs,.c-n,.c-h{font-weight:700;}
+  .c-pre{color:#1F5FAF;}
+  .c-hb{color:#B32C22;}
+  .c-m{color:#7A3FA8;}
+  .c-bs{color:#1E6B4F;}
+  .c-n{color:#C0661A;}
+  .c-h{color:#0E7C86;}
+  table.steps td.lab.c-hb{color:#B32C22;}
+  table.steps td.lab.c-bs{color:#1E6B4F;}
+  table.steps td.lab.c-n{color:#C0661A;}
+  table.steps td.lab.c-h{color:#0E7C86;}
+
+  .blocks{display:flex;border:1px solid var(--line);background:#fff;margin:8px 0 14px;}
+  .blocks div{
+    flex:1;text-align:center;padding:9px 2px;border-right:1px solid var(--line);
+    font-family:var(--mono);font-size:.8rem;color:var(--ink-2);
+  }
+  .blocks div:last-child{border-right:none;}
+  .blocks div span{display:block;color:var(--pink);font-weight:700;font-size:.9rem;}
+
+  .step{margin-bottom:30px;}
+  .step:last-child{margin-bottom:0;}
+  .step h3{
+    font-family:var(--mono);font-size:.76rem;letter-spacing:.14em;text-transform:uppercase;
+    font-weight:700;margin:0 0 8px;color:var(--ink);
+  }
+  .step p{margin:0 0 10px;}
+  .case{font-size:.93rem;color:var(--ink-2);margin:0 0 8px;}
+  ol.anl{margin:0 0 12px;padding-left:22px;font-size:.95rem;}
+  ol.anl li{margin-bottom:3px;}
+  code{font-family:var(--mono);font-size:.9em;background:#E8EAE4;padding:1px 5px;}
+
+  .answer{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:12px;}
+  input[type=text],select{
+    font-family:var(--mono);font-size:.92rem;padding:7px 9px;
+    border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:0;
+  }
+  select{padding:6px 6px;}
+  input[type=text]:focus,select:focus{outline:2px solid var(--pink);outline-offset:1px;}
+  input.ok,select.ok{border-color:var(--ok);background:#EEF6F1;}
+  input.bad,select.bad{border-color:var(--bad);background:#FAEFEE;}
+  input.w-short{width:6rem;}
+  input.w-ip{width:10rem;}
+  input.w-pre{width:3.4rem;}
+  input.w-oct{width:3.6rem;text-align:center;}
+
+  button.check{
+    font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;
+    padding:9px 16px;border:1px solid var(--ink);background:var(--ink);color:#fff;cursor:pointer;border-radius:0;
+  }
+  button.check:hover{background:#000;}
+  button.check:focus-visible{outline:2px solid var(--pink);outline-offset:2px;}
+
+  .msg{font-size:.88rem;min-height:1.3em;margin-top:8px;}
+  .msg.ok{color:var(--ok);font-weight:600;}
+  .msg.hint{color:var(--warn);}
+
+  table.grid{border-collapse:collapse;width:100%;font-size:.9rem;}
+  table.grid th{
+    font-family:var(--mono);font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;
+    background:var(--ink);color:#fff;text-align:left;padding:7px 9px;font-weight:700;
+  }
+  table.grid td{border-bottom:1px solid var(--line-2);padding:6px 9px;vertical-align:middle;}
+  table.grid td.key{font-family:var(--mono);white-space:nowrap;}
+  table.grid td.txt{white-space:nowrap;}
+  table.grid td.center{text-align:center;}
+  table.grid tr.hl td{background:#FBE4EC;}
+  table.grid input[type=text]{width:100%;min-width:8.5rem;}
+  table.grid input.w-pre,table.grid input.w-oct{width:3.6rem;min-width:0;}
+  table.grid input.w-num{min-width:5rem;}
+  .block table.grid td,.info table.grid td{background:#fff;font-family:var(--mono);}
+  .block table.grid tr.hl td{background:#FBE4EC;}
+  .maskcell{display:flex;align-items:center;gap:2px;font-family:var(--mono);font-size:.88rem;white-space:nowrap;}
+  .prefcell{display:flex;align-items:center;gap:3px;font-family:var(--mono);}
+  .scroll{overflow-x:auto;}
+
+  table.own{border-collapse:collapse;width:100%;font-size:.92rem;}
+  table.own td{border-bottom:1px solid var(--line-2);padding:6px 9px;vertical-align:middle;}
+  table.own td.lab{width:15rem;color:var(--ink-2);}
+  table.own tr.given td{background:var(--card-2);}
+
+  .choices{display:flex;flex-direction:column;gap:6px;margin:8px 0 4px;}
+  .choices label{font-size:.94rem;display:flex;gap:9px;align-items:flex-start;cursor:pointer;font-family:var(--mono);}
+  input[type=checkbox]{width:17px;height:17px;accent-color:var(--pink);flex:0 0 auto;margin-top:3px;}
+
+  .freitext{
+    min-height:4.6em;border:1px solid var(--line);background:#fff;padding:8px 10px;
+    font-family:var(--sans);font-size:.95rem;white-space:pre-wrap;margin-top:6px;
+  }
+  .freitext:focus{outline:2px solid var(--pink);outline-offset:1px;}
+  .freitext[data-platzhalter]:empty::before{content:attr(data-platzhalter);color:var(--ink-3);}
+
+  @media (max-width:600px){
+    .sheet{padding:22px 13px 30px;}
+    .demo span.k{width:auto;}
+    .demo div{display:block;}
+    table.own td.lab{width:auto;}
+  }
+  @media print{
+    body{background:#fff;font-size:11pt;}
+    button.check{display:none;}
+    section.task,header.top{box-shadow:none;}
+    .step,.block{break-inside:avoid;}
+    .msg:empty{display:none;}
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+<header class="top">
+  <div class="kicker">Lernfeld 3</div>
+  <h1>Übungsaufgaben Subnetting</h1>
+  <p>Deine Eingaben werden nur lokal in diesem Browser gespeichert. Sichere deine Ergebnisse selbst, zum Beispiel über PDF speichern, denn beim Löschen der Browserdaten gehen sie verloren.</p>
+</header>
+
+<!-- ============ GRUNDLAGEN ============ -->
+<section class="task" id="g">
+  <div class="task-head">
+    <span class="num">Grundlagen</span>
+    <h2>Netze berechnen</h2>
+  </div>
+
+  <div class="info">
+    <p>Die Einsen einer Subnetzmaske stehen immer lückenlos von links. Deshalb kann höchstens ein Oktett der Subnetzmaske einen Wert zwischen 0 und 255 haben, alle anderen sind 255 oder 0. Genau das Oktett, in dem sich die Subnetzmaske ändert, zerlegt den Adressbereich in gleich große Blöcke.</p>
+    <p>Die Netzadresse ist die erste Adresse eines Subnetzes. Die Netzadressen sind die Vielfachen der Blockgröße, du zählst also in Schritten der Blockgröße hoch, beginnend bei 0. Die letzte Adresse eines Subnetzes ist die Broadcastadresse. Alle Adressen dazwischen sind nutzbare Hostadressen. Netzadresse und Broadcastadresse dürfen nicht an einen Host vergeben werden.</p>
+    <div class="demo">
+      <div><span class="k">Netz</span><span class="v">192.168.1.0/24</span></div>
+      <div><span class="k">Netzadresse</span><span class="v">192.168.1.0</span></div>
+      <div><span class="k">Erste Hostadresse</span><span class="v">192.168.1.1</span></div>
+      <div><span class="k">Letzte Hostadresse</span><span class="v">192.168.1.254</span></div>
+      <div><span class="k">Broadcastadresse</span><span class="v">192.168.1.255</span></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h4>Beispiel 255.255.255.<span class="c-m">192</span> also /<span class="c-pre">26</span></h4>
+    <table class="steps">
+      <tr>
+        <td class="lab c-hb">Hostbits</td>
+        <td class="frm"><em>Bits einer IPv4-Adresse minus Anzahl der Einsen in der Subnetzmaske</em><b>32 - <span class="c-pre">26</span> = <span class="c-hb">6</span></b></td>
+      </tr>
+      <tr>
+        <td class="lab c-bs">Blockgröße</td>
+        <td class="frm"><em>2 hoch Hostbits (des betroffenen Oktetts) oder 256 minus Wert des Oktetts, in dem sich die Subnetzmaske ändert</em><b>2<sup class="c-hb">6</sup> = <span class="c-bs">64</span> oder 256 - <span class="c-m">192</span> = <span class="c-bs">64</span></b></td>
+      </tr>
+      <tr>
+        <td class="lab c-n">Netze im Oktett</td>
+        <td class="frm"><em>256 geteilt durch die Blockgröße</em><b>256 : <span class="c-bs">64</span> = <span class="c-n">4</span></b></td>
+      </tr>
+      <tr>
+        <td class="lab c-h">Nutzbare Hosts</td>
+        <td class="frm"><em>2 hoch Hostbits (der gesamten Adresse) minus Netzadresse und Broadcastadresse</em><b>2<sup class="c-hb">6</sup> - 2 = <span class="c-h">62</span></b></td>
+      </tr>
+    </table>
+    <div class="blocks">
+      <div><span>.0</span>0 bis 63</div>
+      <div><span>.64</span>64 bis 127</div>
+      <div><span>.128</span>128 bis 191</div>
+      <div><span>.192</span>192 bis 255</div>
+    </div>
+    <p>Im ersten Block ist .0 die Netzadresse und .63 die Broadcastadresse, nutzbar sind .1 bis .62.</p>
+  </div>
+
+  <div class="block">
+    <h4>Netzadresse und Broadcastadresse bei /26</h4>
+    <p>Die Netzadresse ist die erste Adresse eines Netzes, die Broadcastadresse die letzte. Bei /26 ist die Blockgröße 64, das letzte Oktett zerfällt also in vier gleich große Blöcke:</p>
+    <table class="grid">
+      <tr><th>Bereich</th><th>Netzadresse</th><th>Broadcastadresse</th></tr>
+      <tr><td>.0 bis .63</td><td>.0</td><td>.63</td></tr>
+      <tr><td>.64 bis .127</td><td>.64</td><td>.127</td></tr>
+      <tr><td>.128 bis .191</td><td>.128</td><td>.191</td></tr>
+      <tr><td>.192 bis .255</td><td>.192</td><td>.255</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h4>Beispiel 192.168.50.100/26</h4>
+    <p>Das vierte Oktett hat den Wert 100. Gesucht ist der Block aus der Tabelle oben, in den 100 fällt:</p>
+    <table class="grid">
+      <tr><th>Bereich</th><th>Netzadresse</th><th>Broadcastadresse</th></tr>
+      <tr><td>.0 bis .63</td><td>.0</td><td>.63</td></tr>
+      <tr class="hl"><td>.64 bis .127</td><td>.64</td><td>.127</td></tr>
+      <tr><td>.128 bis .191</td><td>.128</td><td>.191</td></tr>
+      <tr><td>.192 bis .255</td><td>.192</td><td>.255</td></tr>
+    </table>
+    <p>100 liegt im Bereich .64 bis .127. Damit gilt für 192.168.50.100/26:</p>
+    <table class="grid">
+      <tr><th>Netzadresse</th><th>Erste Hostadresse</th><th>Letzte Hostadresse</th><th>Broadcastadresse</th></tr>
+      <tr><td>192.168.50.64</td><td>192.168.50.65</td><td>192.168.50.126</td><td>192.168.50.127</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h4>Dasselbe unterhalb von /24: Beispiel 192.168.100.50/18</h4>
+    <p>/18 bedeutet 18 Einsen: 8 im ersten, 8 im zweiten und 2 im dritten Oktett. Die Subnetzmaske lautet 255.255.192.0. Sie ändert sich also im dritten Oktett, und nur dort gilt die Blockgröße.</p>
+    <table class="steps">
+      <tr>
+        <td class="lab">Hostbits</td>
+        <td class="frm"><em>Bits einer IPv4-Adresse minus Anzahl der Einsen in der Subnetzmaske</em><b>32 - 18 = 14</b></td>
+      </tr>
+      <tr>
+        <td class="lab">Blockgröße</td>
+        <td class="frm"><em>2 hoch Hostbits des betroffenen Oktetts (hier 6 im dritten Oktett) oder 256 minus 192</em><b>2<sup>6</sup> = 64 oder 256 - 192 = 64, gilt im dritten Oktett</b></td>
+      </tr>
+      <tr>
+        <td class="lab">Netze im Oktett</td>
+        <td class="frm"><em>256 geteilt durch die Blockgröße</em><b>256 : 64 = 4</b></td>
+      </tr>
+      <tr>
+        <td class="lab">Nutzbare Hosts</td>
+        <td class="frm"><em>2 hoch Hostbits der gesamten Adresse, also auch die 8 Bit des vierten Oktetts</em><b>2<sup>14</sup> - 2 = 16382</b></td>
+      </tr>
+    </table>
+    <p>Die Blockgröße 64 zählt im dritten Oktett. Das vierte Oktett gehört komplett zum Hostanteil und läuft in jedem Block von 0 bis 255 durch. Die Netzadresse endet deshalb immer auf .0, die Broadcastadresse immer auf .255.</p>
+    <table class="grid">
+      <tr><th>Bereich im dritten Oktett</th><th>Netzadresse</th><th>Broadcastadresse</th></tr>
+      <tr><td>0 bis 63</td><td>192.168.0.0</td><td>192.168.63.255</td></tr>
+      <tr class="hl"><td>64 bis 127</td><td>192.168.64.0</td><td>192.168.127.255</td></tr>
+      <tr><td>128 bis 191</td><td>192.168.128.0</td><td>192.168.191.255</td></tr>
+      <tr><td>192 bis 255</td><td>192.168.192.0</td><td>192.168.255.255</td></tr>
+    </table>
+    <p>Das dritte Oktett hat den Wert 100 und liegt im Bereich 64 bis 127. Damit gilt für 192.168.100.50/18:</p>
+    <table class="grid">
+      <tr><th>Netzadresse</th><th>Erste Hostadresse</th><th>Letzte Hostadresse</th><th>Broadcastadresse</th></tr>
+      <tr><td>192.168.64.0</td><td>192.168.64.1</td><td>192.168.127.254</td><td>192.168.127.255</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ============ AUFGABE 1 ============ -->
+<section class="task" id="a1">
+  <div class="task-head">
+    <span class="num">Aufgabe 1</span>
+    <h2>Präfix und Blockgröße</h2>
+  </div>
+  <div class="step">
+    <p>Fülle die Tabelle aus. Trage in der Spalte Subnetzmaske nur das Oktett ein, das nicht 255 oder 0 ist.</p>
+    <div class="scroll"><table class="grid" id="t1"></table></div>
+    <div class="answer"><button class="check" data-check="a1">Prüfen</button></div>
+    <div class="msg" id="msg-a1"></div>
+  </div>
+</section>
+
+<!-- ============ AUFGABE 2 ============ -->
+<section class="task" id="a2">
+  <div class="task-head">
+    <span class="num">Aufgabe 2</span>
+    <h2>Netzadresse, Broadcast und Hostbereich</h2>
+  </div>
+  <div class="step">
+    <p class="case">Aus Tickets liegen dir die Adressen einiger Hosts mit Präfix vor.</p>
+    <p>Bestimme das Subnetz, in dem der Host liegt. Trage vollständige Adressen ein, zum Beispiel 192.168.1.0.</p>
+    <div class="scroll"><table class="grid" id="t2"></table></div>
+    <div class="answer"><button class="check" data-check="a2">Prüfen</button></div>
+    <div class="msg" id="msg-a2"></div>
+  </div>
+</section>
+
+<!-- ============ AUFGABE 3 ============ -->
+<section class="task" id="a3">
+  <div class="task-head">
+    <span class="num">Aufgabe 3</span>
+    <h2>Privat oder öffentlich</h2>
+  </div>
+  <div class="step">
+    <h3>3a Private Adressbereiche</h3>
+    <p>Trage die privaten Adressbereiche nach RFC 1918 ein. Gib den Bereich in CIDR-Schreibweise an, zum Beispiel 192.0.2.0/24.</p>
+    <div class="scroll"><table class="grid" id="t3a"></table></div>
+    <div class="answer"><button class="check" data-check="a3a">Prüfen</button></div>
+    <div class="msg" id="msg-a3a"></div>
+  </div>
+  <div class="step">
+    <h3>3b Adressen aus der Firewall</h3>
+    <p class="case">Ein Kunde schickt dir Adressen aus der Protokolldatei seiner Firewall.</p>
+    <p>Kreuze alle privaten Adressen an.</p>
+    <div class="choices" id="c3b"></div>
+    <div class="answer"><button class="check" data-check="a3b">Prüfen</button></div>
+    <div class="msg" id="msg-a3b"></div>
+  </div>
+</section>
+
+<!-- ============ AUFGABE 4 ============ -->
+<section class="task" id="a4">
+  <div class="task-head">
+    <span class="num">Aufgabe 4</span>
+    <h2>Dein eigenes Netz</h2>
+  </div>
+  <div class="step">
+    <p class="case">Du bist mit deinem Notebook im WLAN der Schule.</p>
+    <ol class="anl">
+      <li>Öffne unter Windows die Eingabeaufforderung, tippe <code>ipconfig</code> ein und drücke Enter. Unter macOS oder Linux findest du die Werte in den Netzwerkeinstellungen.</li>
+      <li>Suche den WLAN-Adapter und trage seine IPv4-Adresse und seine Subnetzmaske in die ersten beiden Zeilen ein.</li>
+      <li>Berechne daraus alle weiteren Werte.</li>
+    </ol>
+    <table class="own">
+      <tr class="given"><td class="lab">IPv4-Adresse</td><td><input type="text" id="own-ip" class="w-ip" autocomplete="off" spellcheck="false" aria-label="Eigene IPv4-Adresse"></td></tr>
+      <tr class="given"><td class="lab">Subnetzmaske</td><td><input type="text" id="own-mask" class="w-ip" autocomplete="off" spellcheck="false" aria-label="Eigene Subnetzmaske"></td></tr>
+      <tr><td class="lab">Präfix</td><td><div class="prefcell"><span>/</span><input type="text" id="own-prefix" class="w-pre" inputmode="numeric" autocomplete="off" aria-label="Präfix"></div></td></tr>
+      <tr><td class="lab">Hostbits</td><td><input type="text" id="own-hostbits" class="w-short" inputmode="numeric" autocomplete="off" aria-label="Hostbits"></td></tr>
+      <tr><td class="lab">Blockgröße</td><td><input type="text" id="own-block" class="w-short" inputmode="numeric" autocomplete="off" aria-label="Blockgröße"></td></tr>
+      <tr><td class="lab">Netzadresse</td><td><input type="text" id="own-net" class="w-ip" autocomplete="off" spellcheck="false" aria-label="Netzadresse"></td></tr>
+      <tr><td class="lab">Erste Hostadresse</td><td><input type="text" id="own-first" class="w-ip" autocomplete="off" spellcheck="false" aria-label="Erste Hostadresse"></td></tr>
+      <tr><td class="lab">Letzte Hostadresse</td><td><input type="text" id="own-last" class="w-ip" autocomplete="off" spellcheck="false" aria-label="Letzte Hostadresse"></td></tr>
+      <tr><td class="lab">Broadcastadresse</td><td><input type="text" id="own-bc" class="w-ip" autocomplete="off" spellcheck="false" aria-label="Broadcastadresse"></td></tr>
+      <tr><td class="lab">Nutzbare Hosts</td><td><input type="text" id="own-hosts" class="w-ip" inputmode="numeric" autocomplete="off" aria-label="Nutzbare Hosts"></td></tr>
+      <tr><td class="lab">Privat nach RFC 1918</td><td><select id="own-privat" aria-label="Privat nach RFC 1918"><option value=""></option><option value="ja">ja</option><option value="nein">nein</option></select></td></tr>
+    </table>
+    <div class="answer"><button class="check" data-check="a4">Prüfen</button></div>
+    <div class="msg" id="msg-a4"></div>
+  </div>
+</section>
+
+<!-- ============ AUFGABE 5 ============ -->
+<section class="task" id="a5">
+  <div class="task-head">
+    <span class="num">Aufgabe 5</span>
+    <h2>VLSM-Plan für ein /24-Netz</h2>
+  </div>
+  <div class="step">
+    <h3>5a Subnetze planen</h3>
+    <p class="case">Die Firma nutzt das Netz 192.168.40.0/24. Jede Abteilung soll ein eigenes Subnetz bekommen.</p>
+    <p>Plane die Subnetze so, dass jeder Bedarf gedeckt ist und möglichst wenige Adressen verschenkt werden. Vergib die Subnetze lückenlos ab 192.168.40.0.</p>
+    <div class="scroll"><table class="grid" id="t5"></table></div>
+    <div class="answer"><button class="check" data-check="a5">Prüfen</button></div>
+    <div class="msg" id="msg-a5"></div>
+  </div>
+  <div class="step">
+    <h3>5b Freie Adressen</h3>
+    <p>Wie viele Adressen des Netzes 192.168.40.0/24 bleiben ungenutzt?</p>
+    <div class="answer">
+      <input type="text" id="a5-frei" class="w-short" inputmode="numeric" autocomplete="off" aria-label="Ungenutzte Adressen">
+      <button class="check" data-check="a5b">Prüfen</button>
+    </div>
+    <div class="msg" id="msg-a5b"></div>
+  </div>
+</section>
+
+<!-- ============ AUFGABE 6 ============ -->
+<section class="task" id="a6">
+  <div class="task-head">
+    <span class="num">Aufgabe 6</span>
+    <h2>Können sich /26 und /27 erreichen?</h2>
+  </div>
+  <div class="step">
+    <h3>6a Paare prüfen</h3>
+    <p class="case">Im Netz gibt es kein Standardgateway.</p>
+    <p>Prüfe für jedes Paar, ob Host A den Host B direkt erreicht, ob Host B den Host A direkt erreicht und ob ein Ping von A nach B eine Antwort bekommt.</p>
+    <div class="scroll"><table class="grid" id="t6"></table></div>
+    <div class="answer"><button class="check" data-check="a6">Prüfen</button></div>
+    <div class="msg" id="msg-a6"></div>
+  </div>
+  <div class="step">
+    <h3>6b Stellungnahme</h3>
+    <p class="case">Ein Kollege behauptet: "Hosts mit /26 und /27 können nie miteinander kommunizieren."</p>
+    <p>Nimm Stellung zu seiner Aussage.</p>
+    <div class="freitext" id="a6-stellung" contenteditable="true" data-platzhalter="Deine Stellungnahme"></div>
+  </div>
+</section>
+
+<!-- ============ AUFGABE 7 ============ -->
+<section class="task" id="a7">
+  <div class="task-head">
+    <span class="num">Aufgabe 7</span>
+    <h2>Fehlersuche im Adressplan</h2>
+  </div>
+  <div class="step">
+    <h3>7a Fehler finden</h3>
+    <p class="case">Ein Azubi hat für das Netz 10.20.0.0/24 den folgenden Adressplan erstellt.</p>
+    <p>Kreuze an, welche Einträge fehlerhaft sind, und begründe jeden Fehler.</p>
+    <div class="scroll"><table class="grid" id="t7a"></table></div>
+    <div class="answer"><button class="check" data-check="a7a">Prüfen</button></div>
+    <div class="msg" id="msg-a7a"></div>
+    <div class="freitext" id="a7-begruendung" contenteditable="true" data-platzhalter="Deine Begründungen"></div>
+  </div>
+  <div class="step">
+    <h3>7b Plan korrigieren</h3>
+    <p>Korrigiere den Plan. Alle Subnetze müssen in 10.20.0.0/24 liegen, den Bedarf decken und dürfen sich nicht überschneiden. Trage jedes Subnetz in CIDR-Schreibweise ein, auch die unveränderten.</p>
+    <div class="scroll"><table class="grid" id="t7b"></table></div>
+    <div class="answer"><button class="check" data-check="a7b">Prüfen</button></div>
+    <div class="msg" id="msg-a7b"></div>
+  </div>
+</section>
+
+<!-- ============ AUFGABE 8 ============ -->
+<section class="task" id="a8">
+  <div class="task-head">
+    <span class="num">Aufgabe 8</span>
+    <h2>Ganze Netze im privaten Bereich</h2>
+  </div>
+  <div class="step">
+    <p class="case">Kunden wollen die folgenden Netze intern nutzen.</p>
+    <p>Bestimme die erste und die letzte Adresse jedes Netzes und entscheide, ob das ganze Netz im privaten Bereich nach RFC 1918 liegt.</p>
+    <div class="scroll"><table class="grid" id="t8"></table></div>
+    <div class="answer"><button class="check" data-check="a8">Prüfen</button></div>
+    <div class="msg" id="msg-a8"></div>
+  </div>
+</section>
+
+<!-- ============ AUFGABE 9 ============ -->
+<section class="task" id="a9">
+  <div class="task-head">
+    <span class="num">Aufgabe 9</span>
+    <h2>VLSM-Plan für ein /22-Netz</h2>
+  </div>
+  <div class="step">
+    <h3>9a Subnetze planen</h3>
+    <p class="case">Der Firma steht das Netz 172.16.8.0/22 zur Verfügung.</p>
+    <p>Plane alle Subnetze lückenlos ab 172.16.8.0, sodass jeder Bedarf gedeckt ist und möglichst wenige Adressen verschenkt werden.</p>
+    <div class="scroll"><table class="grid" id="t9"></table></div>
+    <div class="answer"><button class="check" data-check="a9">Prüfen</button></div>
+    <div class="msg" id="msg-a9"></div>
+  </div>
+  <div class="step">
+    <h3>9b Subnetzmaske der Verwaltung</h3>
+    <p>Gib die Subnetzmaske der Verwaltung in dezimaler Schreibweise an.</p>
+    <div class="answer">
+      <input type="text" id="a9-maske" class="w-ip" autocomplete="off" spellcheck="false" aria-label="Subnetzmaske der Verwaltung">
+      <button class="check" data-check="a9b">Prüfen</button>
+    </div>
+    <div class="msg" id="msg-a9b"></div>
+  </div>
+  <div class="step">
+    <h3>9c Eine weitere Abteilung</h3>
+    <p class="case">Später soll eine weitere Abteilung mit 40 Hosts dazukommen.</p>
+    <p>Reicht der restliche Platz im Netz 172.16.8.0/22? Begründe.</p>
+    <div class="answer">
+      <select id="a9-reicht" aria-label="Reicht der Platz">
+        <option value=""></option>
+        <option value="ja">ja</option>
+        <option value="nein">nein</option>
+      </select>
+      <button class="check" data-check="a9c">Prüfen</button>
+    </div>
+    <div class="msg" id="msg-a9c"></div>
+    <div class="freitext" id="a9-begruendung" contenteditable="true" data-platzhalter="Deine Begründung"></div>
+  </div>
+</section>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ================= Helfer ================= */
+  var checks = {};
+  function $(id){ return document.getElementById(id); }
+  function say(id, text, kind){
+    var el = $(id);
+    el.textContent = text;
+    el.className = "msg" + (kind ? " " + kind : "");
+  }
+  function clean(v){ return (v || "").replace(/\s+/g, "").trim(); }
+  function normIp(v){ return clean(v).replace(/^\.+|\.+$/g, ""); }
+  function mark(el, ok){
+    el.classList.remove("ok", "bad");
+    el.classList.add(ok ? "ok" : "bad");
+  }
+  function unmark(list){
+    list.forEach(function(el){ el.classList.remove("ok", "bad"); });
+  }
+  function onlyDigits(el){
+    el.addEventListener("input", function(){
+      el.value = el.value.replace(/[^0-9]/g, "");
+    });
+  }
+  function parseIp(v){
+    var s = normIp(v);
+    var p = s.split(".");
+    if (p.length !== 4) return null;
+    var n = 0;
+    for (var i = 0; i < 4; i++){
+      if (!/^\d{1,3}$/.test(p[i])) return null;
+      var o = Number(p[i]);
+      if (o > 255) return null;
+      n = n * 256 + o;
+    }
+    return n;
+  }
+  function intToIp(n){
+    return [Math.floor(n / 16777216) % 256, Math.floor(n / 65536) % 256,
+            Math.floor(n / 256) % 256, n % 256].join(".");
+  }
+  function size(p){ return Math.pow(2, 32 - p); }
+  function maskOctets(p){
+    var out = [];
+    for (var i = 0; i < 4; i++){
+      var bits = Math.min(8, Math.max(0, p - i * 8));
+      out.push(256 - Math.pow(2, 8 - bits));
+    }
+    return out;
+  }
+  function maskDotted(p){ return maskOctets(p).join("."); }
+  function prefixOfMask(n){
+    /* liefert das Präfix oder null, wenn die Einsen nicht lückenlos stehen */
+    for (var p = 0; p <= 32; p++){
+      if (parseIp(maskDotted(p)) === n) return p;
+    }
+    return null;
+  }
+  function blockSize(p){ return Math.pow(2, 8 - (p % 8)); }
+  function minPrefix(hosts){
+    for (var p = 30; p >= 1; p--){ if (size(p) - 2 >= hosts) return p; }
+    return 1;
+  }
+  function parsePrefix(v){
+    var s = clean(v).replace(/^\//, "");
+    if (!/^\d{1,2}$/.test(s)) return null;
+    var n = Number(s);
+    return (n >= 1 && n <= 32) ? n : null;
+  }
+  function parseCidr(v){
+    var s = clean(v);
+    var parts = s.split("/");
+    if (parts.length !== 2) return null;
+    var ip = parseIp(parts[0]);
+    var p = parsePrefix(parts[1]);
+    if (ip === null || p === null) return null;
+    return { ip: ip, p: p };
+  }
+  var RFC = [
+    { von: "10.0.0.0",    bis: "10.255.255.255",  cidr: "10.0.0.0/8" },
+    { von: "172.16.0.0",  bis: "172.31.255.255",  cidr: "172.16.0.0/12" },
+    { von: "192.168.0.0", bis: "192.168.255.255", cidr: "192.168.0.0/16" }
+  ];
+  function isPrivateRange(a, b){
+    for (var k = 0; k < RFC.length; k++){
+      var lo = parseIp(RFC[k].von), hi = parseIp(RFC[k].bis);
+      if (a >= lo && b <= hi) return true;
+    }
+    return false;
+  }
+
+  function th(tr, labels){
+    labels.forEach(function(x){
+      var h = document.createElement("th");
+      h.textContent = x;
+      tr.appendChild(h);
+    });
+  }
+  function tdText(tr, text, cls){
+    var td = document.createElement("td");
+    if (cls) td.className = cls;
+    td.textContent = text;
+    tr.appendChild(td);
+    return td;
+  }
+  function tdInput(tr, id, label, cls, numeric){
+    var td = document.createElement("td");
+    var inp = document.createElement("input");
+    inp.type = "text";
+    inp.id = id;
+    inp.autocomplete = "off";
+    inp.spellcheck = false;
+    if (cls) inp.className = cls;
+    if (numeric){ inp.inputMode = "numeric"; onlyDigits(inp); }
+    inp.setAttribute("aria-label", label);
+    td.appendChild(inp);
+    tr.appendChild(td);
+    return inp;
+  }
+  function tdPrefix(tr, id, label){
+    var td = document.createElement("td");
+    var cell = document.createElement("div");
+    cell.className = "prefcell";
+    var sl = document.createElement("span");
+    sl.textContent = "/";
+    var inp = document.createElement("input");
+    inp.type = "text";
+    inp.id = id;
+    inp.className = "w-pre";
+    inp.inputMode = "numeric";
+    inp.autocomplete = "off";
+    inp.setAttribute("aria-label", label);
+    cell.appendChild(sl);
+    cell.appendChild(inp);
+    td.appendChild(cell);
+    tr.appendChild(td);
+    return inp;
+  }
+  function tdSelect(tr, id, label){
+    var td = document.createElement("td");
+    td.className = "center";
+    var sel = document.createElement("select");
+    sel.id = id;
+    sel.setAttribute("aria-label", label);
+    ["", "ja", "nein"].forEach(function(v){
+      var o = document.createElement("option");
+      o.value = v;
+      o.textContent = v;
+      sel.appendChild(o);
+    });
+    td.appendChild(sel);
+    tr.appendChild(td);
+    return sel;
+  }
+  function tdCheck(tr, id, label){
+    var td = document.createElement("td");
+    td.className = "center";
+    var cb = document.createElement("input");
+    cb.type = "checkbox";
+    cb.id = id;
+    cb.setAttribute("aria-label", label);
+    td.appendChild(cb);
+    tr.appendChild(td);
+    return cb;
+  }
+
+  /* ================= Aufgabe 1 ================= */
+  var A1 = [29, 26, 23, 21, 19, 17, 14, 10];
+  var a1Rows = [];
+  (function(){
+    var t = $("t1");
+    var head = document.createElement("tr");
+    th(head, ["Präfix", "Subnetzmaske", "Hostbits", "Blockgröße", "Netze im Oktett", "Nutzbare Hosts"]);
+    t.appendChild(head);
+    A1.forEach(function(p){
+      var tr = document.createElement("tr");
+      tdText(tr, "/" + p, "key");
+
+      var octIndex = Math.floor(p / 8);
+      var tdM = document.createElement("td");
+      var cell = document.createElement("div");
+      cell.className = "maskcell";
+      var pre = document.createElement("span");
+      pre.textContent = new Array(octIndex + 1).join("255.");
+      var octIn = document.createElement("input");
+      octIn.type = "text";
+      octIn.id = "a1-m-" + p;
+      octIn.className = "w-oct";
+      octIn.inputMode = "numeric";
+      octIn.autocomplete = "off";
+      octIn.setAttribute("aria-label", "Oktett der Subnetzmaske für /" + p);
+      onlyDigits(octIn);
+      cell.appendChild(pre);
+      cell.appendChild(octIn);
+      if (octIndex < 3){
+        var suf = document.createElement("span");
+        suf.textContent = new Array(3 - octIndex + 1).join(".0");
+        cell.appendChild(suf);
+      }
+      tdM.appendChild(cell);
+      tr.appendChild(tdM);
+
+      var hb = tdInput(tr, "a1-hb-" + p, "Hostbits für /" + p, "w-num", true);
+      var b = tdInput(tr, "a1-b-" + p, "Blockgröße für /" + p, "w-num", true);
+      var n = tdInput(tr, "a1-n-" + p, "Netze im Oktett für /" + p, "w-num", true);
+      var h = tdInput(tr, "a1-h-" + p, "Nutzbare Hosts für /" + p, "w-num", true);
+      t.appendChild(tr);
+      var bs = blockSize(p);
+      a1Rows.push({ p: p, cells: [octIn, hb, b, n, h],
+        exp: [maskOctets(p)[octIndex], 32 - p, bs, 256 / bs, size(p) - 2] });
+    });
+  })();
+
+  checks.a1 = function(){
+    var LABELS = ["Das Oktett der Subnetzmaske", "Die Anzahl der Hostbits", "Die Blockgröße", "Die Anzahl der Netze im Oktett", "Die Anzahl nutzbarer Hosts"];
+    for (var r = 0; r < a1Rows.length; r++){
+      var row = a1Rows[r];
+      unmark(row.cells);
+    }
+    for (var r2 = 0; r2 < a1Rows.length; r2++){
+      var rw = a1Rows[r2];
+      for (var c = 0; c < 5; c++){
+        var v = clean(rw.cells[c].value);
+        if (v === ""){ say("msg-a1", "In der Zeile /" + rw.p + " fehlt noch ein Wert.", "hint"); return; }
+        var ok = Number(v) === rw.exp[c];
+        mark(rw.cells[c], ok);
+        if (!ok){
+          if (c === 2 && Number(v) === size(rw.p)){
+            say("msg-a1", "Die Blockgröße in der Zeile /" + rw.p + " ist mit allen Hostbits gerechnet. Sie gilt nur im Oktett, in dem sich die Subnetzmaske ändert.", "hint");
+            return;
+          }
+          if (c === 4 && Number(v) === rw.exp[2] - 2){
+            say("msg-a1", "Die nutzbaren Hosts in der Zeile /" + rw.p + " sind nur mit dem betroffenen Oktett gerechnet. Hier zählen alle Hostbits der gesamten Adresse.", "hint");
+            return;
+          }
+          say("msg-a1", LABELS[c] + " stimmt in der Zeile /" + rw.p + " noch nicht.", "hint");
+          return;
+        }
+      }
+    }
+    say("msg-a1", "Die Tabelle stimmt vollständig.", "ok");
+  };
+
+  /* ================= Aufgabe 2 ================= */
+  var A2 = [
+    { ip: "192.168.10.77",  p: 27 },
+    { ip: "10.10.13.7",     p: 22 },
+    { ip: "172.16.77.5",    p: 20 },
+    { ip: "10.200.130.40",  p: 18 },
+    { ip: "10.77.3.9",      p: 12 }
+  ];
+  var a2Rows = [];
+  (function(){
+    var t = $("t2");
+    var head = document.createElement("tr");
+    th(head, ["Hostadresse", "Netzadresse", "Erste Hostadresse", "Letzte Hostadresse", "Broadcastadresse"]);
+    t.appendChild(head);
+    A2.forEach(function(h, i){
+      var tr = document.createElement("tr");
+      tdText(tr, h.ip + "/" + h.p, "key");
+      var cells = [];
+      ["net", "first", "last", "bc"].forEach(function(k){
+        cells.push(tdInput(tr, "a2-" + i + "-" + k, h.ip + "/" + h.p + " " + k));
+      });
+      t.appendChild(tr);
+      var s = size(h.p);
+      var base = Math.floor(parseIp(h.ip) / s) * s;
+      a2Rows.push({ label: h.ip + "/" + h.p, cells: cells,
+        exp: [intToIp(base), intToIp(base + 1), intToIp(base + s - 2), intToIp(base + s - 1)] });
+    });
+  })();
+
+  checks.a2 = function(){
+    var LABELS = ["Die Netzadresse", "Die erste Hostadresse", "Die letzte Hostadresse", "Die Broadcastadresse"];
+    a2Rows.forEach(function(r){ unmark(r.cells); });
+    for (var r = 0; r < a2Rows.length; r++){
+      var row = a2Rows[r];
+      for (var c = 0; c < 4; c++){
+        var v = normIp(row.cells[c].value);
+        if (v === ""){ say("msg-a2", "In der Zeile " + row.label + " fehlt noch ein Wert.", "hint"); return; }
+        var ok = v === row.exp[c];
+        mark(row.cells[c], ok);
+        if (!ok){ say("msg-a2", LABELS[c] + " stimmt in der Zeile " + row.label + " noch nicht.", "hint"); return; }
+      }
+    }
+    say("msg-a2", "Alle Subnetze stimmen.", "ok");
+  };
+
+  /* ================= Aufgabe 4: eigenes Netz ================= */
+  checks.a4 = function(){
+    var ids = ["own-ip", "own-mask", "own-prefix", "own-hostbits", "own-block", "own-net", "own-first", "own-last", "own-bc", "own-hosts", "own-privat"];
+    var el = {};
+    ids.forEach(function(id){ el[id] = $(id); });
+    unmark(ids.map(function(id){ return el[id]; }));
+
+    var ip = parseIp(el["own-ip"].value);
+    if (ip === null){ mark(el["own-ip"], false); say("msg-a4", "Trage eine gültige IPv4-Adresse ein, zum Beispiel 10.1.2.3.", "hint"); return; }
+    var maskN = parseIp(el["own-mask"].value);
+    var p = (maskN === null) ? null : prefixOfMask(maskN);
+    if (p === null || p < 1 || p > 30){ mark(el["own-mask"], false); say("msg-a4", "Das ist keine gültige Subnetzmaske. Prüfe, ob du sie richtig aus ipconfig übernommen hast.", "hint"); return; }
+
+    for (var i = 2; i < ids.length; i++){
+      if (clean(el[ids[i]].value) === ""){ say("msg-a4", "Es fehlt noch mindestens ein Wert.", "hint"); return; }
+    }
+
+    var s = size(p);
+    var base = Math.floor(ip / s) * s;
+    if (ip === base || ip === base + s - 1){
+      mark(el["own-ip"], false);
+      say("msg-a4", "Diese Adresse kann kein Host haben. Prüfe, ob du die IPv4-Adresse richtig übernommen hast.", "hint");
+      return;
+    }
+    var checksList = [
+      { id: "own-prefix",   ok: parsePrefix(el["own-prefix"].value) === p,                 text: "Das Präfix stimmt noch nicht." },
+      { id: "own-hostbits", ok: Number(clean(el["own-hostbits"].value)) === 32 - p,       text: "Die Anzahl der Hostbits stimmt noch nicht." },
+      { id: "own-block",    ok: (function(){
+          var v = Number(clean(el["own-block"].value));
+          if (p % 8 === 0) return v === 1 || v === 256;
+          return v === blockSize(p);
+        })(),                                                                            text: "Die Blockgröße stimmt noch nicht. Sie gilt im Oktett, in dem sich die Subnetzmaske ändert." },
+      { id: "own-net",      ok: normIp(el["own-net"].value) === intToIp(base),             text: "Die Netzadresse stimmt noch nicht." },
+      { id: "own-first",    ok: normIp(el["own-first"].value) === intToIp(base + 1),       text: "Die erste Hostadresse stimmt noch nicht." },
+      { id: "own-last",     ok: normIp(el["own-last"].value) === intToIp(base + s - 2),    text: "Die letzte Hostadresse stimmt noch nicht." },
+      { id: "own-bc",       ok: normIp(el["own-bc"].value) === intToIp(base + s - 1),      text: "Die Broadcastadresse stimmt noch nicht." },
+      { id: "own-hosts",    ok: Number(clean(el["own-hosts"].value)) === s - 2,            text: "Die Anzahl nutzbarer Hosts stimmt noch nicht." },
+      { id: "own-privat",   ok: el["own-privat"].value === (isPrivateRange(ip, ip) ? "ja" : "nein"), text: "Die Einordnung nach RFC 1918 stimmt noch nicht." }
+    ];
+    mark(el["own-ip"], true);
+    mark(el["own-mask"], true);
+    for (var k = 0; k < checksList.length; k++){
+      mark(el[checksList[k].id], checksList[k].ok);
+      if (!checksList[k].ok){ say("msg-a4", checksList[k].text, "hint"); return; }
+    }
+    say("msg-a4", "Alle Werte zu deinem Netz stimmen.", "ok");
+  };
+
+  /* ================= Aufgabe 3a ================= */
+  var a4aRows = [];
+  (function(){
+    var t = $("t3a");
+    var head = document.createElement("tr");
+    th(head, ["Bereich", "Von", "Bis", "CIDR"]);
+    t.appendChild(head);
+    for (var i = 0; i < 3; i++){
+      var tr = document.createElement("tr");
+      tdText(tr, String(i + 1), "key");
+      var von = tdInput(tr, "a3a-" + i + "-von", "Bereich " + (i + 1) + " von");
+      var bis = tdInput(tr, "a3a-" + i + "-bis", "Bereich " + (i + 1) + " bis");
+      var cidr = tdInput(tr, "a3a-" + i + "-cidr", "Bereich " + (i + 1) + " CIDR");
+      t.appendChild(tr);
+      a4aRows.push({ von: von, bis: bis, cidr: cidr });
+    }
+  })();
+
+  checks.a3a = function(){
+    var used = {};
+    a4aRows.forEach(function(r){ unmark([r.von, r.bis, r.cidr]); });
+    for (var r = 0; r < a4aRows.length; r++){
+      var row = a4aRows[r];
+      var von = normIp(row.von.value), bis = normIp(row.bis.value), cidr = clean(row.cidr.value);
+      if (von === "" || bis === "" || cidr === ""){ say("msg-a3a", "In Bereich " + (r + 1) + " fehlt noch ein Wert.", "hint"); return; }
+      var hit = null;
+      for (var k = 0; k < RFC.length; k++){ if (RFC[k].von === von) hit = RFC[k]; }
+      if (!hit || used[hit.von]){
+        mark(row.von, false);
+        say("msg-a3a", "Die Startadresse in Bereich " + (r + 1) + " gehört zu keinem noch fehlenden privaten Bereich.", "hint");
+        return;
+      }
+      used[hit.von] = true;
+      mark(row.von, true);
+      var okB = bis === hit.bis;
+      mark(row.bis, okB);
+      if (!okB){ say("msg-a3a", "Die Endadresse in Bereich " + (r + 1) + " stimmt noch nicht.", "hint"); return; }
+      var okC = cidr === hit.cidr;
+      mark(row.cidr, okC);
+      if (!okC){ say("msg-a3a", "Die CIDR-Schreibweise in Bereich " + (r + 1) + " stimmt noch nicht.", "hint"); return; }
+    }
+    say("msg-a3a", "Alle drei Bereiche stimmen.", "ok");
+  };
+
+  /* ================= Aufgabe 3b ================= */
+  var A3B = [
+    { ip: "172.15.200.1",   priv: false },
+    { ip: "10.255.255.254", priv: true  },
+    { ip: "192.167.10.1",   priv: false },
+    { ip: "172.31.0.5",     priv: true  },
+    { ip: "11.0.0.1",       priv: false },
+    { ip: "192.168.255.1",  priv: true  },
+    { ip: "172.32.0.1",     priv: false }
+  ];
+  (function(){
+    var host = $("c3b");
+    A3B.forEach(function(o, i){
+      var lab = document.createElement("label");
+      var cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.id = "a3b-" + i;
+      var sp = document.createElement("span");
+      sp.textContent = o.ip;
+      lab.appendChild(cb);
+      lab.appendChild(sp);
+      host.appendChild(lab);
+    });
+  })();
+
+  checks.a3b = function(){
+    var any = false, allOk = true;
+    for (var i = 0; i < A3B.length; i++){
+      var cb = $("a3b-" + i);
+      if (cb.checked) any = true;
+      if (cb.checked !== A3B[i].priv) allOk = false;
+    }
+    if (!any){ say("msg-a3b", "Kreuze die privaten Adressen an.", "hint"); return; }
+    if (allOk){ say("msg-a3b", "Richtig.", "ok"); }
+    else { say("msg-a3b", "Noch nicht. Prüfe jede Adresse gegen die Grenzen aus 3a, besonders das zweite Oktett.", "hint"); }
+  };
+
+  /* ================= VLSM-Prüfung (Aufgabe 5 und 9) ================= */
+  function buildPlan(tableId, prefix, rows, withMask){
+    var t = $(tableId);
+    var head = document.createElement("tr");
+    var labels = ["Bereich", "Bedarf", "Präfix"];
+    if (withMask) labels.push("Subnetzmaske");
+    labels.push("Netzadresse", "Broadcastadresse");
+    th(head, labels);
+    t.appendChild(head);
+    var out = [];
+    rows.forEach(function(r, i){
+      var tr = document.createElement("tr");
+      tdText(tr, r.name, "txt");
+      tdText(tr, r.bedarf + " Hosts", "txt");
+      var o = { name: r.name, bedarf: r.bedarf };
+      o.p = tdPrefix(tr, prefix + "-" + i + "-p", "Präfix " + r.name);
+      if (withMask) o.m = tdInput(tr, prefix + "-" + i + "-m", "Subnetzmaske " + r.name);
+      o.net = tdInput(tr, prefix + "-" + i + "-net", "Netzadresse " + r.name);
+      o.bc = tdInput(tr, prefix + "-" + i + "-bc", "Broadcastadresse " + r.name);
+      t.appendChild(tr);
+      out.push(o);
+    });
+    return out;
+  }
+
+  function checkPlan(rows, baseIp, basePrefix, msgId){
+    var base = parseIp(baseIp), baseEnd = base + size(basePrefix) - 1;
+    var ranges = [];
+    rows.forEach(function(row){ unmark([row.p, row.net, row.bc].concat(row.m ? [row.m] : [])); });
+    for (var r = 0; r < rows.length; r++){
+      var row = rows[r];
+      var fields = [row.p, row.net, row.bc];
+      if (row.m) fields.push(row.m);
+      for (var f = 0; f < fields.length; f++){
+        if (clean(fields[f].value) === ""){ say(msgId, "In der Zeile " + row.name + " fehlt noch ein Wert.", "hint"); return; }
+      }
+      var p = parsePrefix(row.p.value), need = minPrefix(row.bedarf);
+      if (p === null){ mark(row.p, false); say(msgId, "Das Präfix in der Zeile " + row.name + " ist ungültig.", "hint"); return; }
+      if (p > need){ mark(row.p, false); say(msgId, "Das Präfix in der Zeile " + row.name + " bietet zu wenige Hostadressen für den Bedarf.", "hint"); return; }
+      if (p < need){ mark(row.p, false); say(msgId, "Das Präfix in der Zeile " + row.name + " deckt den Bedarf, verschenkt aber unnötig viele Adressen.", "hint"); return; }
+      mark(row.p, true);
+      if (row.m){
+        var okM = normIp(row.m.value) === maskDotted(p);
+        mark(row.m, okM);
+        if (!okM){ say(msgId, "Die Subnetzmaske in der Zeile " + row.name + " passt nicht zum Präfix.", "hint"); return; }
+      }
+      var net = parseIp(row.net.value);
+      if (net === null){ mark(row.net, false); say(msgId, "Die Netzadresse in der Zeile " + row.name + " ist keine gültige Adresse.", "hint"); return; }
+      if (net % size(p) !== 0){ mark(row.net, false); say(msgId, "Die Netzadresse in der Zeile " + row.name + " ist für /" + p + " keine gültige Netzadresse.", "hint"); return; }
+      if (net < base || net + size(p) - 1 > baseEnd){ mark(row.net, false); say(msgId, "Das Subnetz in der Zeile " + row.name + " liegt nicht vollständig im Netz " + baseIp + "/" + basePrefix + ".", "hint"); return; }
+      mark(row.net, true);
+      var okBc = normIp(row.bc.value) === intToIp(net + size(p) - 1);
+      mark(row.bc, okBc);
+      if (!okBc){ say(msgId, "Die Broadcastadresse in der Zeile " + row.name + " stimmt noch nicht.", "hint"); return; }
+      ranges.push({ name: row.name, a: net, b: net + size(p) - 1, row: row });
+    }
+    for (var i = 0; i < ranges.length; i++){
+      for (var j = i + 1; j < ranges.length; j++){
+        if (ranges[i].a <= ranges[j].b && ranges[j].a <= ranges[i].b){
+          mark(ranges[i].row.net, false);
+          mark(ranges[j].row.net, false);
+          say(msgId, "Die Subnetze " + ranges[i].name + " und " + ranges[j].name + " überschneiden sich.", "hint");
+          return;
+        }
+      }
+    }
+    say(msgId, "Der Plan ist vollständig und korrekt.", "ok");
+  }
+
+  /* ================= Aufgabe 5 ================= */
+  var a5Rows = buildPlan("t5", "a5", [
+    { name: "Vertrieb", bedarf: 50 },
+    { name: "Technik", bedarf: 25 },
+    { name: "Buchhaltung", bedarf: 10 },
+    { name: "Verbindungsnetz Außenstandort", bedarf: 2 }
+  ], true);
+  checks.a5 = function(){ checkPlan(a5Rows, "192.168.40.0", 24, "msg-a5"); };
+  checks.a5b = function(){
+    var el = $("a5-frei"), v = clean(el.value);
+    unmark([el]);
+    if (v === ""){ say("msg-a5b", "Trage eine Zahl ein.", "hint"); return; }
+    var ok = Number(v) === 140;
+    mark(el, ok);
+    if (ok){ say("msg-a5b", "Richtig.", "ok"); }
+    else { say("msg-a5b", "Das stimmt noch nicht.", "hint"); }
+  };
+
+  /* ================= Aufgabe 6 ================= */
+  var A6 = [
+    { a: "192.168.60.10/26", b: "192.168.60.20/27" },
+    { a: "192.168.60.70/26", b: "192.168.60.100/27" },
+    { a: "192.168.60.50/27", b: "192.168.60.130/26" }
+  ];
+  function reaches(src, dst){
+    var s = parseCidr(src), d = parseCidr(dst);
+    var sz = size(s.p);
+    return Math.floor(s.ip / sz) === Math.floor(d.ip / sz);
+  }
+  var a6Rows = [];
+  (function(){
+    var t = $("t6");
+    var head = document.createElement("tr");
+    th(head, ["Paar", "Host A", "Host B", "A erreicht B direkt", "B erreicht A direkt", "Ping von A nach B erfolgreich"]);
+    t.appendChild(head);
+    A6.forEach(function(pair, i){
+      var tr = document.createElement("tr");
+      tdText(tr, String(i + 1), "key");
+      tdText(tr, pair.a, "key");
+      tdText(tr, pair.b, "key");
+      var ab = tdSelect(tr, "a6-" + i + "-ab", "Paar " + (i + 1) + " A erreicht B");
+      var ba = tdSelect(tr, "a6-" + i + "-ba", "Paar " + (i + 1) + " B erreicht A");
+      var ping = tdSelect(tr, "a6-" + i + "-ping", "Paar " + (i + 1) + " Ping");
+      t.appendChild(tr);
+      var eAB = reaches(pair.a, pair.b), eBA = reaches(pair.b, pair.a);
+      a6Rows.push({ sels: [ab, ba, ping], exp: [eAB, eBA, eAB && eBA] });
+    });
+  })();
+
+  checks.a6 = function(){
+    var LABELS = ["A erreicht B", "B erreicht A", "Ping"];
+    var all = [];
+    a6Rows.forEach(function(r){ all = all.concat(r.sels); });
+    unmark(all);
+    for (var r = 0; r < a6Rows.length; r++){
+      for (var c = 0; c < 3; c++){
+        if (a6Rows[r].sels[c].value === ""){ say("msg-a6", "Bei Paar " + (r + 1) + " fehlt noch eine Auswahl.", "hint"); return; }
+      }
+    }
+    var wrong = 0, first = "";
+    for (var r2 = 0; r2 < a6Rows.length; r2++){
+      for (var c2 = 0; c2 < 3; c2++){
+        var s = a6Rows[r2].sels[c2];
+        var ok = (s.value === "ja") === a6Rows[r2].exp[c2];
+        mark(s, ok);
+        if (!ok){ wrong++; if (!first) first = "Paar " + (r2 + 1) + ", Spalte " + LABELS[c2]; }
+      }
+    }
+    if (wrong === 0){ say("msg-a6", "Alle Angaben stimmen.", "ok"); }
+    else { say("msg-a6", "Noch nicht alles richtig, zum Beispiel bei " + first + ". Jeder Host prüft mit seiner eigenen Subnetzmaske.", "hint"); }
+  };
+
+  /* ================= Aufgabe 7 ================= */
+  var A7 = [
+    { name: "Produktion",      bedarf: 100, netz: "10.20.0.0/25",   bad: false },
+    { name: "Lager",           bedarf: 28,  netz: "10.20.0.128/27", bad: false },
+    { name: "Büro",            bedarf: 12,  netz: "10.20.0.144/28", bad: true  },
+    { name: "WLAN Gäste",      bedarf: 20,  netz: "10.20.0.200/27", bad: true  },
+    { name: "Server",          bedarf: 7,   netz: "10.20.0.240/29", bad: true  },
+    { name: "Verbindungsnetz", bedarf: 2,   netz: "10.20.0.252/30", bad: false }
+  ];
+  var a7aBoxes = [], a7bInputs = [];
+  (function(){
+    var t = $("t7a");
+    var head = document.createElement("tr");
+    th(head, ["Bereich", "Bedarf", "Subnetz", "Fehlerhaft"]);
+    t.appendChild(head);
+    A7.forEach(function(r, i){
+      var tr = document.createElement("tr");
+      tdText(tr, r.name, "txt");
+      tdText(tr, r.bedarf + " Hosts", "txt");
+      tdText(tr, r.netz, "key");
+      a7aBoxes.push(tdCheck(tr, "a7a-" + i, r.name + " fehlerhaft"));
+      t.appendChild(tr);
+    });
+
+    var t2 = $("t7b");
+    var head2 = document.createElement("tr");
+    th(head2, ["Bereich", "Bedarf", "Korrigiertes Subnetz"]);
+    t2.appendChild(head2);
+    A7.forEach(function(r, i){
+      var tr = document.createElement("tr");
+      tdText(tr, r.name, "txt");
+      tdText(tr, r.bedarf + " Hosts", "txt");
+      a7bInputs.push(tdInput(tr, "a7b-" + i, "Korrigiertes Subnetz " + r.name));
+      t2.appendChild(tr);
+    });
+  })();
+
+  checks.a7a = function(){
+    var any = false, allOk = true;
+    for (var i = 0; i < A7.length; i++){
+      if (a7aBoxes[i].checked) any = true;
+      if (a7aBoxes[i].checked !== A7[i].bad) allOk = false;
+    }
+    if (!any){ say("msg-a7a", "Kreuze die fehlerhaften Einträge an.", "hint"); return; }
+    if (allOk){ say("msg-a7a", "Richtig. Begründe jetzt jeden Fehler.", "ok"); }
+    else { say("msg-a7a", "Noch nicht. Prüfe bei jedem Eintrag den Bedarf, die Netzadresse und die Überschneidung mit den anderen Subnetzen.", "hint"); }
+  };
+
+  checks.a7b = function(){
+    var base = parseIp("10.20.0.0"), baseEnd = base + 255;
+    var ranges = [];
+    unmark(a7bInputs);
+    for (var i = 0; i < A7.length; i++){
+      var el = a7bInputs[i], name = A7[i].name;
+      if (clean(el.value) === ""){ say("msg-a7b", "In der Zeile " + name + " fehlt noch das Subnetz.", "hint"); return; }
+      var c = parseCidr(el.value);
+      if (!c){ mark(el, false); say("msg-a7b", "In der Zeile " + name + " steht keine gültige CIDR-Schreibweise.", "hint"); return; }
+      if (size(c.p) - 2 < A7[i].bedarf){ mark(el, false); say("msg-a7b", "Das Subnetz in der Zeile " + name + " bietet zu wenige Hostadressen.", "hint"); return; }
+      if (c.ip % size(c.p) !== 0){ mark(el, false); say("msg-a7b", "In der Zeile " + name + " ist die Adresse keine gültige Netzadresse für /" + c.p + ".", "hint"); return; }
+      if (c.ip < base || c.ip + size(c.p) - 1 > baseEnd){ mark(el, false); say("msg-a7b", "Das Subnetz in der Zeile " + name + " liegt nicht vollständig in 10.20.0.0/24.", "hint"); return; }
+      mark(el, true);
+      ranges.push({ name: name, a: c.ip, b: c.ip + size(c.p) - 1, el: el });
+    }
+    for (var x = 0; x < ranges.length; x++){
+      for (var y = x + 1; y < ranges.length; y++){
+        if (ranges[x].a <= ranges[y].b && ranges[y].a <= ranges[x].b){
+          mark(ranges[x].el, false);
+          mark(ranges[y].el, false);
+          say("msg-a7b", "Die Subnetze " + ranges[x].name + " und " + ranges[y].name + " überschneiden sich.", "hint");
+          return;
+        }
+      }
+    }
+    say("msg-a7b", "Der korrigierte Plan ist gültig.", "ok");
+  };
+
+  /* ================= Aufgabe 8 ================= */
+  var A8 = ["10.128.0.0/9", "172.24.0.0/13", "192.168.0.0/15", "172.0.0.0/11", "172.32.0.0/12"];
+  var a8Rows = [];
+  (function(){
+    var t = $("t8");
+    var head = document.createElement("tr");
+    th(head, ["Netz", "Erste Adresse", "Letzte Adresse", "Vollständig privat"]);
+    t.appendChild(head);
+    A8.forEach(function(n, i){
+      var tr = document.createElement("tr");
+      tdText(tr, n, "key");
+      var f = tdInput(tr, "a8-" + i + "-erste", "Erste Adresse " + n);
+      var l = tdInput(tr, "a8-" + i + "-letzte", "Letzte Adresse " + n);
+      var s = tdSelect(tr, "a8-" + i + "-privat", "Vollständig privat " + n);
+      t.appendChild(tr);
+      var c = parseCidr(n);
+      var a = c.ip, b = c.ip + size(c.p) - 1;
+      a8Rows.push({ netz: n, f: f, l: l, s: s, exp: [intToIp(a), intToIp(b), isPrivateRange(a, b) ? "ja" : "nein"] });
+    });
+  })();
+
+  checks.a8 = function(){
+    a8Rows.forEach(function(r){ unmark([r.f, r.l, r.s]); });
+    for (var r = 0; r < a8Rows.length; r++){
+      var row = a8Rows[r];
+      if (clean(row.f.value) === "" || clean(row.l.value) === "" || row.s.value === ""){
+        say("msg-a8", "In der Zeile " + row.netz + " fehlt noch ein Wert.", "hint"); return;
+      }
+      var okF = normIp(row.f.value) === row.exp[0];
+      mark(row.f, okF);
+      if (!okF){ say("msg-a8", "Die erste Adresse in der Zeile " + row.netz + " stimmt noch nicht.", "hint"); return; }
+      var okL = normIp(row.l.value) === row.exp[1];
+      mark(row.l, okL);
+      if (!okL){ say("msg-a8", "Die letzte Adresse in der Zeile " + row.netz + " stimmt noch nicht. Überlege, in welchem Oktett sich die Subnetzmaske ändert.", "hint"); return; }
+      var okS = row.s.value === row.exp[2];
+      mark(row.s, okS);
+      if (!okS){ say("msg-a8", "Die Entscheidung in der Zeile " + row.netz + " stimmt noch nicht. Vergleiche erste und letzte Adresse mit den Bereichen aus 3a.", "hint"); return; }
+    }
+    say("msg-a8", "Alle Netze stimmen.", "ok");
+  };
+
+  /* ================= Aufgabe 9 ================= */
+  var a9Rows = buildPlan("t9", "a9", [
+    { name: "Verwaltung", bedarf: 300 },
+    { name: "Entwicklung", bedarf: 200 },
+    { name: "Vertrieb", bedarf: 120 },
+    { name: "Support", bedarf: 60 },
+    { name: "Verbindungsnetz 1", bedarf: 2 },
+    { name: "Verbindungsnetz 2", bedarf: 2 },
+    { name: "Verbindungsnetz 3", bedarf: 2 }
+  ], false);
+  checks.a9 = function(){ checkPlan(a9Rows, "172.16.8.0", 22, "msg-a9"); };
+  checks.a9b = function(){
+    var el = $("a9-maske");
+    unmark([el]);
+    if (clean(el.value) === ""){ say("msg-a9b", "Trage die Subnetzmaske ein.", "hint"); return; }
+    var ok = normIp(el.value) === maskDotted(23);
+    mark(el, ok);
+    if (ok){ say("msg-a9b", "Richtig.", "ok"); }
+    else { say("msg-a9b", "Das stimmt noch nicht.", "hint"); }
+  };
+  checks.a9c = function(){
+    var el = $("a9-reicht");
+    unmark([el]);
+    if (el.value === ""){ say("msg-a9c", "Wähle eine Antwort.", "hint"); return; }
+    var ok = el.value === "nein";
+    mark(el, ok);
+    if (ok){ say("msg-a9c", "Richtig. Begründe deine Antwort.", "ok"); }
+    else { say("msg-a9c", "Das stimmt noch nicht. Zähle die freien Adressen und überlege, wie groß das neue Subnetz sein muss.", "hint"); }
+  };
+
+  /* ================= Buttons ================= */
+  var btns = document.querySelectorAll("button.check");
+  for (var b = 0; b < btns.length; b++){
+    (function(btn){
+      btn.addEventListener("click", function(){
+        var fn = checks[btn.dataset.check];
+        if (fn) fn();
+      });
+    })(btns[b]);
+  }
+})();
+</script>
+<!-- vt-speicher -->
+<style>
+.vt-tools{max-width:980px;margin:8px auto 40px;padding:0 22px;display:flex;gap:12px;flex-wrap:wrap}
+.vt-tools button{font:inherit;font-size:.95em;padding:8px 18px;border:1.5px solid currentColor;background:transparent;color:inherit;cursor:pointer}
+.vt-tools button:hover{background:rgba(128,128,128,.16)}
+@media print{.vt-tools{display:none}}
+</style>
+<div class="vt-tools"><button type="button" id="vt-print" onclick="window.print()">PDF speichern</button><button type="button" id="vt-wipe">Alle Eingaben löschen</button></div>
+<script>
+(function(){
+  var PREFIX = 'bsfi-uebung-subnetting:';
+  var EXCLUDE = '';
+  var TOGGLES = '';
+  var WIPE_ID = '';
+  var store = null;
+  try { store = window.localStorage; store.setItem(PREFIX + '__t', '1'); store.removeItem(PREFIX + '__t'); }
+  catch (e) { store = null; }
+  if (!store) { return; }
+
+  /* Felder bei jedem Zugriff frisch einsammeln, weil Blaetter Teile neu aufbauen koennen */
+  function collect(){
+    var out = [];
+    var idx = 0;
+    Array.prototype.forEach.call(document.querySelectorAll('input, textarea, select, [contenteditable="true"]'), function(el){
+      var t = (el.type || '').toLowerCase();
+      if (el.tagName === 'INPUT' && /^(button|submit|reset|password|file|hidden|image)$/.test(t)) { return; }
+      if (EXCLUDE && el.matches(EXCLUDE)) { return; }
+      if (el.closest('.vt-tools')) { return; }
+      var key = el.id ? 'id:' + el.id : 'n' + idx;
+      idx++;
+      out.push({ el: el, key: PREFIX + key, kind: (t === 'checkbox' || t === 'radio') ? 'check' : (el.isContentEditable ? 'rich' : 'value') });
+    });
+    return out;
+  }
+  function collectToggles(){
+    return TOGGLES ? Array.prototype.map.call(document.querySelectorAll(TOGGLES), function(el, i){
+      return { el: el, key: PREFIX + 'tg' + i };
+    }) : [];
+  }
+
+  function read(f){
+    if (f.kind === 'check') { return f.el.checked ? '1' : ''; }
+    if (f.kind === 'rich') { return f.el.textContent; }
+    return f.el.value;
+  }
+  function fire(el, type){
+    el.dispatchEvent(new Event(type, { bubbles: true }));
+  }
+
+  collect().forEach(function(f){
+    var saved = null;
+    try { saved = store.getItem(f.key); } catch (e) {}
+    if (saved === null) { return; }
+    if (f.kind === 'check') { f.el.checked = (saved === '1'); fire(f.el, 'change'); }
+    else if (f.kind === 'rich') { f.el.textContent = saved; fire(f.el, 'input'); }
+    else {
+      f.el.value = saved;
+      fire(f.el, f.el.tagName === 'SELECT' ? 'change' : 'input');
+    }
+  });
+  collectToggles().forEach(function(t){
+    var saved = null;
+    try { saved = store.getItem(t.key); } catch (e) {}
+    if (saved !== null && t.el.getAttribute('aria-pressed') !== saved) { t.el.click(); }
+  });
+
+  var wiping = false;
+  var timer = null;
+  function save(){
+    if (wiping) { return; }
+    collect().forEach(function(f){
+      var val = read(f);
+      try {
+        if (val && String(val).trim()) { store.setItem(f.key, val); } else { store.removeItem(f.key); }
+      } catch (e) {}
+    });
+    collectToggles().forEach(function(t){
+      try {
+        if (t.el.getAttribute('aria-pressed') === 'true') { store.setItem(t.key, 'true'); } else { store.removeItem(t.key); }
+      } catch (e) {}
+    });
+  }
+  function queue(){
+    if (timer) { clearTimeout(timer); }
+    timer = setTimeout(save, 400);
+  }
+  document.addEventListener('input', queue, true);
+  document.addEventListener('change', queue, true);
+  if (TOGGLES) { document.addEventListener('click', queue, true); }
+  window.addEventListener('pagehide', save);
+  document.addEventListener('visibilitychange', function(){ if (document.visibilityState === 'hidden') { save(); } });
+
+  function dropAll(){
+    for (var i = store.length - 1; i >= 0; i--) {
+      var k = store.key(i);
+      if (k && k.indexOf(PREFIX) === 0) { try { store.removeItem(k); } catch (e) {} }
+    }
+  }
+
+  if (WIPE_ID) {
+    /* vorhandener Zuruecksetzen-Button: nach seinem Handler den Speicher angleichen */
+    var own = document.getElementById(WIPE_ID);
+    if (own) { own.addEventListener('click', function(){ if (timer) { clearTimeout(timer); } save(); }); }
+    return;
+  }
+  var wipe = document.getElementById('vt-wipe');
+  if (wipe) {
+    wipe.addEventListener('click', function(){
+      if (!window.confirm('Wirklich alle Eingaben auf diesem Blatt löschen?')) { return; }
+      wiping = true;
+      if (timer) { clearTimeout(timer); }
+      dropAll();
+      /* Felder leeren, sonst stellt Firefox sie beim Neuladen wieder her */
+      collect().forEach(function(f){
+        try {
+          if (f.kind === 'check') { f.el.checked = false; }
+          else if (f.kind === 'rich') { f.el.textContent = ''; }
+          else if (f.el.tagName === 'SELECT') { f.el.selectedIndex = 0; }
+          else { f.el.value = ''; }
+        } catch (e) {}
+      });
+      window.location.reload();
+    });
+  }
+})();
+</script>
+</body>
+</html>
