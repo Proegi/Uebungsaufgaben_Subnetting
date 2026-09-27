@@ -372,17 +372,8 @@
     <h2>Privat oder öffentlich</h2>
   </div>
   <div class="step">
-    <h3>4a Grenzen der privaten Bereiche</h3>
-    <p class="case">Ein Kunde will in seiner Firewall Regeln anlegen, die genau an den Grenzen der privaten Adressbereiche nach RFC 1918 greifen. Dafür braucht er zu jedem Bereich die letzte Adresse sowie die öffentlichen Adressen, die direkt davor und direkt dahinter liegen.</p>
-    <p>Fülle die Tabelle aus.</p>
-    <div class="scroll"><table class="grid" id="t3a"></table></div>
-    <div class="answer"><button class="check" data-check="a3a">Prüfen</button></div>
-    <div class="msg" id="msg-a3a"></div>
-  </div>
-  <div class="step">
-    <h3>4b Adressen aus der Firewall</h3>
     <p class="case">Ein Kunde schickt dir Adressen aus der Protokolldatei seiner Firewall.</p>
-    <p>Kreuze alle privaten Adressen an.</p>
+    <p>Kreuze alle Adressen an, die in einem privaten Adressbereich nach RFC 1918 liegen.</p>
     <div class="choices" id="c3b"></div>
     <div class="answer"><button class="check" data-check="a3b">Prüfen</button></div>
     <div class="msg" id="msg-a3b"></div>
@@ -943,60 +934,22 @@
     say("msg-a4", "Alle Werte zu deinem Netz stimmen.", "ok");
   };
 
-  /* ================= Aufgabe 3a: Grenzen ================= */
-  var A3A = ["172.16.0.0/12", "192.168.0.0/16", "10.0.0.0/8"];
-  var a4aRows = [];
-  (function(){
-    var t = $("t3a");
-    var head = document.createElement("tr");
-    th(head, ["Bereich", "Adresse direkt davor", "Letzte Adresse im Bereich", "Adresse direkt dahinter", "Anzahl Adressen"]);
-    t.appendChild(head);
-    A3A.forEach(function(c, i){
-      var tr = document.createElement("tr");
-      tdText(tr, c, "key");
-      var cd = parseCidr(c);
-      var first = cd.ip, last = cd.ip + size(cd.p) - 1;
-      var vor = tdInput(tr, "a3g-" + i + "-vor", "Adresse direkt vor " + c);
-      var ende = tdInput(tr, "a3g-" + i + "-ende", "Letzte Adresse von " + c);
-      var nach = tdInput(tr, "a3g-" + i + "-nach", "Adresse direkt hinter " + c);
-      var anz = tdInput(tr, "a3g-" + i + "-anz", "Anzahl Adressen von " + c, "w-num", true);
-      t.appendChild(tr);
-      a4aRows.push({ c: c, cells: [vor, ende, nach, anz], exp: [first - 1, last, last + 1, size(cd.p)] });
-    });
-  })();
-
-  checks.a3a = function(){
-    var LABELS = ["Die Adresse direkt davor", "Die letzte Adresse", "Die Adresse direkt dahinter", "Die Anzahl der Adressen"];
-    a4aRows.forEach(function(r){ unmark(r.cells); });
-    for (var r = 0; r < a4aRows.length; r++){
-      var row = a4aRows[r];
-      for (var c = 0; c < 4; c++){
-        var v = clean(row.cells[c].value);
-        if (v === ""){ say("msg-a3a", "In der Zeile " + row.c + " fehlt noch ein Wert.", "hint"); return; }
-        var got = c === 3 ? Number(v) : parseIp(v);
-        var ok = got === row.exp[c];
-        mark(row.cells[c], ok);
-        if (!ok){
-          if (c !== 3 && got === null){ say("msg-a3a", LABELS[c] + " in der Zeile " + row.c + " ist keine gültige IPv4-Adresse.", "hint"); return; }
-          if (c === 0 && got === row.exp[0] + 1){ say("msg-a3a", "In der Zeile " + row.c + " ist das die erste Adresse im Bereich, gesucht ist die Adresse davor.", "hint"); return; }
-          if (c === 2 && got === row.exp[1]){ say("msg-a3a", "In der Zeile " + row.c + " ist das die letzte Adresse im Bereich, gesucht ist die Adresse dahinter.", "hint"); return; }
-          say("msg-a3a", LABELS[c] + " stimmt in der Zeile " + row.c + " noch nicht.", "hint");
-          return;
-        }
-      }
-    }
-    say("msg-a3a", "Alle Grenzen stimmen.", "ok");
-  };
-
   /* ================= Aufgabe 3b ================= */
   var A3B = [
     { ip: "172.15.200.1",   priv: false },
     { ip: "10.255.255.254", priv: true  },
     { ip: "192.167.10.1",   priv: false },
     { ip: "172.31.0.5",     priv: true  },
+    { ip: "172.20.14.3",    priv: true  },
     { ip: "11.0.0.1",       priv: false },
     { ip: "192.168.255.1",  priv: true  },
-    { ip: "172.32.0.1",     priv: false }
+    { ip: "168.192.1.1",    priv: false },
+    { ip: "172.32.0.1",     priv: false },
+    { ip: "10.0.0.1",       priv: true  },
+    { ip: "9.255.255.255",  priv: false },
+    { ip: "192.168.0.254",  priv: true  },
+    { ip: "192.169.0.1",    priv: false },
+    { ip: "172.16.0.1",     priv: true  }
   ];
   (function(){
     var host = $("c3b");
@@ -1004,7 +957,7 @@
       var lab = document.createElement("label");
       var cb = document.createElement("input");
       cb.type = "checkbox";
-      cb.id = "a3b-" + i;
+      cb.id = "a3c-" + i;
       var sp = document.createElement("span");
       sp.textContent = o.ip;
       lab.appendChild(cb);
@@ -1016,13 +969,13 @@
   checks.a3b = function(){
     var any = false, allOk = true;
     for (var i = 0; i < A3B.length; i++){
-      var cb = $("a3b-" + i);
+      var cb = $("a3c-" + i);
       if (cb.checked) any = true;
       if (cb.checked !== A3B[i].priv) allOk = false;
     }
     if (!any){ say("msg-a3b", "Kreuze die privaten Adressen an.", "hint"); return; }
     if (allOk){ say("msg-a3b", "Richtig.", "ok"); }
-    else { say("msg-a3b", "Noch nicht. Prüfe jede Adresse gegen die Grenzen aus 4a, besonders das zweite Oktett.", "hint"); }
+    else { say("msg-a3b", "Noch nicht. Prüfe jede Adresse gegen die privaten Bereiche nach RFC 1918, besonders das zweite Oktett.", "hint"); }
   };
 
   /* ================= VLSM-Prüfung (Aufgabe 5 und 9) ================= */
@@ -1278,7 +1231,7 @@
       if (!okL){ say("msg-a8", "Die letzte Adresse in der Zeile " + row.netz + " stimmt noch nicht. Überlege, in welchem Oktett sich die Subnetzmaske ändert.", "hint"); return; }
       var okS = row.s.value === row.exp[2];
       mark(row.s, okS);
-      if (!okS){ say("msg-a8", "Die Entscheidung in der Zeile " + row.netz + " stimmt noch nicht. Vergleiche erste und letzte Adresse mit den Bereichen aus Aufgabe 4.", "hint"); return; }
+      if (!okS){ say("msg-a8", "Die Entscheidung in der Zeile " + row.netz + " stimmt noch nicht. Vergleiche erste und letzte Adresse mit den privaten Bereichen nach RFC 1918.", "hint"); return; }
     }
     say("msg-a8", "Alle Netze stimmen.", "ok");
   };
