@@ -322,10 +322,23 @@
   </div>
 </section>
 
+<!-- ============ AUFGABE VON BIS ============ -->
+<section class="task" id="a0">
+  <div class="task-head">
+    <span class="num">Aufgabe 1</span>
+    <h2>Adressen von bis zählen</h2>
+  </div>
+  <div class="step">
+    <p>Wie viele IPv4-Adressen umfasst der Bereich jeweils? Die erste und die letzte Adresse zählen mit. Jede Zeile wird geprüft, sobald du Enter drückst oder das Feld verlässt.</p>
+    <div class="scroll"><table class="grid" id="t0"></table></div>
+    <div class="msg" id="msg-a0"></div>
+  </div>
+</section>
+
 <!-- ============ AUFGABE 1 ============ -->
 <section class="task" id="a1">
   <div class="task-head">
-    <span class="num">Aufgabe 1</span>
+    <span class="num">Aufgabe 2</span>
     <h2>Präfix und Blockgröße</h2>
   </div>
   <div class="step">
@@ -339,7 +352,7 @@
 <!-- ============ AUFGABE 2 ============ -->
 <section class="task" id="a2">
   <div class="task-head">
-    <span class="num">Aufgabe 2</span>
+    <span class="num">Aufgabe 3</span>
     <h2>Netzadresse, Broadcast und Hostbereich</h2>
   </div>
   <div class="step">
@@ -354,7 +367,7 @@
 <!-- ============ AUFGABE 3 ============ -->
 <section class="task" id="a3">
   <div class="task-head">
-    <span class="num">Aufgabe 3</span>
+    <span class="num">Aufgabe 4</span>
     <h2>Privat oder öffentlich</h2>
   </div>
   <div class="step">
@@ -377,7 +390,7 @@
 <!-- ============ AUFGABE 4 ============ -->
 <section class="task" id="a4">
   <div class="task-head">
-    <span class="num">Aufgabe 4</span>
+    <span class="num">Aufgabe 5</span>
     <h2>Dein eigenes Netz</h2>
   </div>
   <div class="step">
@@ -408,7 +421,7 @@
 <!-- ============ AUFGABE 5 ============ -->
 <section class="task" id="a5">
   <div class="task-head">
-    <span class="num">Aufgabe 5</span>
+    <span class="num">Aufgabe 6</span>
     <h2>VLSM-Plan für ein /24-Netz</h2>
   </div>
   <div class="step">
@@ -433,7 +446,7 @@
 <!-- ============ AUFGABE 6 ============ -->
 <section class="task" id="a6">
   <div class="task-head">
-    <span class="num">Aufgabe 6</span>
+    <span class="num">Aufgabe 7</span>
     <h2>Können sich /26 und /27 erreichen?</h2>
   </div>
   <div class="step">
@@ -455,7 +468,7 @@
 <!-- ============ AUFGABE 7 ============ -->
 <section class="task" id="a7">
   <div class="task-head">
-    <span class="num">Aufgabe 7</span>
+    <span class="num">Aufgabe 8</span>
     <h2>Fehlersuche im Adressplan</h2>
   </div>
   <div class="step">
@@ -479,7 +492,7 @@
 <!-- ============ AUFGABE 8 ============ -->
 <section class="task" id="a8">
   <div class="task-head">
-    <span class="num">Aufgabe 8</span>
+    <span class="num">Aufgabe 9</span>
     <h2>Ganze Netze im privaten Bereich</h2>
   </div>
   <div class="step">
@@ -494,7 +507,7 @@
 <!-- ============ AUFGABE 9 ============ -->
 <section class="task" id="a9">
   <div class="task-head">
-    <span class="num">Aufgabe 9</span>
+    <span class="num">Aufgabe 10</span>
     <h2>VLSM-Plan für ein /22-Netz</h2>
   </div>
   <div class="step">
@@ -700,6 +713,45 @@
     tr.appendChild(td);
     return cb;
   }
+
+  /* ================= Aufgabe von bis ================= */
+  var A0 = [
+    ["10.0.0.0",     "10.0.0.255"],
+    ["10.0.1.0",     "10.0.3.255"],
+    ["172.16.0.0",   "172.16.9.255"],
+    ["192.168.10.0", "192.168.25.255"],
+    ["10.0.0.128",   "10.0.1.127"],
+    ["10.5.0.0",     "10.5.255.255"],
+    ["10.1.0.0",     "10.3.255.255"],
+    ["172.16.0.0",   "172.31.255.255"],
+    ["10.0.0.0",     "10.255.255.255"]
+  ];
+  (function(){
+    var t = $("t0");
+    var head = document.createElement("tr");
+    th(head, ["Von", "Bis", "Anzahl Adressen"]);
+    t.appendChild(head);
+    A0.forEach(function(r, i){
+      var tr = document.createElement("tr");
+      tdText(tr, r[0], "key");
+      tdText(tr, r[1], "key");
+      var inp = tdInput(tr, "a0-n-" + i, "Anzahl Adressen von " + r[0] + " bis " + r[1], "w-num", true);
+      t.appendChild(tr);
+      var exp = parseIp(r[1]) - parseIp(r[0]) + 1;
+      inp.addEventListener("change", function(){
+        var v = clean(inp.value);
+        if (v === ""){ unmark([inp]); say("msg-a0", ""); return; }
+        var ok = Number(v) === exp;
+        mark(inp, ok);
+        if (ok){ say("msg-a0", ""); return; }
+        if (Number(v) === exp - 1){
+          say("msg-a0", "Von " + r[0] + " bis " + r[1] + ": Fast. Hast du die erste Adresse mitgezählt?", "hint");
+        } else {
+          say("msg-a0", "Von " + r[0] + " bis " + r[1] + " stimmt noch nicht.", "hint");
+        }
+      });
+    });
+  })();
 
   /* ================= Aufgabe 1 ================= */
   var A1 = [29, 26, 23, 21, 19, 17, 14, 10];
