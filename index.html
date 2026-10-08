@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Übungsaufgaben Subnetting</title>
+<title>Übungsaufgaben Subnetting und Wireshark</title>
 <!-- Loesung: Uebungsaufgaben_Subnetting_Loesung.md -->
 <style>
   :root{
@@ -197,6 +197,42 @@
     .step,.block{break-inside:avoid;}
     .msg:empty{display:none;}
   }
+
+  /* Wireshark */
+  table.grid th.mitte,table.grid td.mitte{text-align:center;}
+  table.grid td.mono{font-family:var(--mono);white-space:nowrap;}
+  table.grid td.ok{background:#EEF6F1;}
+  table.grid td.bad{background:#FAEFEE;}
+  .wire{border:1px solid var(--ink);background:#fff;font-family:var(--mono);font-size:.76rem;}
+  .wire-titel{background:#2B2F33;color:#E9ECE6;padding:5px 10px;font-size:.7rem;letter-spacing:.08em;}
+  .wire-liste{overflow-x:auto;border-bottom:1px solid var(--line);}
+  p.hinweis{font-family:var(--mono);font-size:.74rem;color:var(--ink-2);}
+  .wire-filter{display:flex;align-items:center;gap:10px;padding:5px 8px;border-bottom:1px solid var(--line);background:var(--card-2);}
+  .wire-filter input{flex:1;min-width:0;font-family:var(--mono);font-size:.76rem;padding:4px 7px;border:1px solid var(--line);background:#fff;}
+  .wire-filter input.gueltig{background:#AFFFAF;}
+  .wire-filter input.ungueltig{background:#FFAFAF;}
+  .wire-filter span{font-size:.68rem;color:var(--ink-3);white-space:nowrap;}
+  .wire-liste table{border-collapse:collapse;width:100%;min-width:640px;}
+  .wire-liste th{text-align:left;background:#ECEDEA;padding:3px 8px;font-weight:700;border-bottom:1px solid var(--line);}
+  .wire-liste td{padding:2px 8px;white-space:nowrap;cursor:pointer;}
+  .wire-liste tr.p-arp td{background:#FAF0D7;}
+  .wire-liste tr.p-tcp td{background:#E7E6FF;}
+  .wire-liste tr.p-http td{background:#E4FFC7;}
+  .wire-liste tr.p-dns td{background:#DAEEFF;}
+  .wire-liste tr.sel td{background:#2F6FB5;color:#fff;}
+  .baum{padding:6px 8px;border-bottom:1px solid var(--line);overflow-x:auto;min-height:150px;}
+  .baum ul{list-style:none;margin:0;padding-left:14px;}
+  .baum > ul{padding-left:0;}
+  .baum li > div{cursor:pointer;white-space:nowrap;padding:0 3px;}
+  .baum li > div:hover,.baum li > div.hl{background:#CFE0F5;}
+  .baum li > div .pf{display:inline-block;width:1em;color:var(--ink-3);}
+  .baum li.zu > ul{display:none;}
+  .hex{padding:6px 8px;overflow-x:auto;white-space:pre;line-height:1.5;}
+  .hex .b{cursor:pointer;}
+  .hex .b.hl{background:#2F6FB5;color:#fff;}
+  .hex .off{color:var(--ink-3);}
+  .hex .asc{color:var(--ink-2);}
+  @media print{.wire-filter{display:none!important;} .wire-liste,.baum,.hex{overflow:visible;} .baum li.zu > ul{display:block;}}
 </style>
 </head>
 <body>
@@ -204,7 +240,7 @@
 
 <header class="top">
   <div class="kicker">Lernfeld 3</div>
-  <h1>Übungsaufgaben Subnetting</h1>
+  <h1>Übungsaufgaben Subnetting und Wireshark</h1>
   <p>Deine Eingaben werden nur lokal in diesem Browser gespeichert. Sichere deine Ergebnisse selbst, zum Beispiel über PDF speichern, denn beim Löschen der Browserdaten gehen sie verloren.</p>
 </header>
 
@@ -534,6 +570,161 @@
     </div>
     <div class="msg" id="msg-a9c"></div>
     <div class="freitext" id="a9-begruendung" contenteditable="true" data-platzhalter="Deine Begründung"></div>
+  </div>
+</section>
+
+<!-- ================= WIRESHARK ================= -->
+<!-- ================= AUFGABE 11 ================= -->
+<section class="task" id="ws1">
+  <div class="task-head">
+    <span class="num">Aufgabe 11</span>
+    <h2>Der Mitschnitt</h2>
+  </div>
+  <div class="step lang">
+    <p class="case">In einer Arztpraxis bucht eine Mitarbeiterin mit ihrem Laptop über die Webseite eines Terminportals einen Termin für eine Patientin. Der Webserver steht bei einem Anbieter im Internet. Auf dem Laptop läuft dabei ein Mitschnittprogramm wie Wireshark.</p>
+    <p>Klicke auf einen Frame, um ihn zu untersuchen. Wenn du auf eine Zeile im Baum klickst, siehst du darunter, welche Bytes dazugehören. Das klappt auch umgekehrt.</p>
+    <div class="wire" id="wire">
+      <div class="wire-titel">Mitschnitt: WLAN, Laptop 192.168.50.12</div>
+      <div class="wire-filter"><input type="text" id="w-filter" autocomplete="off" spellcheck="false" placeholder="Anzeigefilter anwenden, z. B. tcp" aria-label="Anzeigefilter"><span id="w-filter-info"></span></div>
+      <div class="wire-liste"><table id="wire-tab"><thead><tr><th>Nr.</th><th>Source</th><th>Destination</th><th>Protocol</th><th>Length</th><th>Info</th></tr></thead><tbody></tbody></table></div>
+      <div class="baum" id="baum"></div>
+      <div class="hex" id="hex"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= AUFGABE 12 ================= -->
+<section class="task" id="ws2">
+  <div class="task-head">
+    <span class="num">Aufgabe 12</span>
+    <h2>Filtern wie im echten Wireshark</h2>
+  </div>
+  <div class="step">
+    <p>Über der Liste gibt es eine Filterzeile wie im echten Wireshark. Ein Filter blendet alle Frames aus, die nicht passen. Probiere ihn aus. Trage dann jeweils einen Filter ein, der genau die gesuchten Frames zeigt, nicht mehr und nicht weniger.</p>
+    <p class="hinweis">Bausteine: arp, ip, tcp, udp, dns, http, ip.addr == …, ip.src == …, ip.dst == …, eth.src == …, eth.dst == …, tcp.port == …, udp.port == …. Mehrere Bedingungen verbindest du mit and oder or, mit not schließt du etwas aus.</p>
+    <div class="scroll"><table class="own">
+      <tr><td class="lab">nur die Frames, die einen ARP-Teil enthalten</td><td><input type="text" id="f-arp" autocomplete="off" spellcheck="false" aria-label="Filter ARP"></td></tr>
+      <tr><td class="lab">nur die Frames, die einen IP-Header enthalten</td><td><input type="text" id="f-ip" autocomplete="off" spellcheck="false" aria-label="Filter IP-Header"></td></tr>
+      <tr><td class="lab">nur die Frames, die zur Namensauflösung (DNS) gehören</td><td><input type="text" id="f-dns" autocomplete="off" spellcheck="false" aria-label="Filter DNS"></td></tr>
+      <tr><td class="lab">nur die Frames, die der Webserver abgeschickt hat</td><td><input type="text" id="f-srv" autocomplete="off" spellcheck="false" aria-label="Filter Frames vom Webserver"></td></tr>
+      <tr><td class="lab">nur die Frames, die der Laptop an die MAC-Adresse des Routers schickt</td><td><input type="text" id="f-rt" autocomplete="off" spellcheck="false" aria-label="Filter Frames an den Router"></td></tr>
+      <tr><td class="lab">Der Filter tcp zeigt auch die Frames, bei denen in der Spalte Protocol HTTP steht. Der Grund:</td><td><select id="f-warum" aria-label="Grund für HTTP-Frames beim Filter tcp"><option value=""></option><option value="fehler">Der Filter arbeitet ungenau.</option><option value="port">Port 80 gehört zu TCP und HTTP gleichzeitig.</option><option value="kaps">HTTP steckt in einem TCP-Segment, die Frames enthalten also auch einen TCP-Header.</option><option value="gleich">HTTP und TCP sind zwei Namen für dasselbe Protokoll.</option></select></td></tr>
+    </table></div>
+    <div class="answer"><button class="check" data-check="filt">Prüfen</button></div>
+    <div class="msg" id="msg-filt"></div>
+  </div>
+</section>
+
+<!-- ================= AUFGABE 13 ================= -->
+<section class="task" id="ws3">
+  <div class="task-head">
+    <span class="num">Aufgabe 13</span>
+    <h2>Header-Steckbrief</h2>
+  </div>
+  <div class="step">
+    <p>Suche die Werte im Mitschnitt. Klicke dazu den Frame an und klappe die passende Zeile im Baum auf.</p>
+    <div class="scroll"><table class="grid">
+      <tr><th>Frame</th><th>Zeile im Baum</th><th>Feld</th><th>Wert</th></tr>
+      <tr><td class="mono">1</td><td>Ethernet II</td><td>Type</td><td><input type="text" id="s-typ" autocomplete="off" aria-label="Type in Frame 1"></td></tr>
+      <tr><td class="mono">3</td><td>Internet Protocol Version 4</td><td>Protocol</td><td><input type="text" id="s-proto" autocomplete="off" aria-label="Protocol in Frame 3"></td></tr>
+      <tr><td class="mono">4</td><td>Domain Name System</td><td>Answers, addr</td><td><input type="text" id="s-addr" autocomplete="off" aria-label="Antwortadresse in Frame 4"></td></tr>
+      <tr><td class="mono">5</td><td>Transmission Control Protocol</td><td>Flags (Name in Klammern)</td><td><input type="text" id="s-flags" autocomplete="off" aria-label="Flags in Frame 5"></td></tr>
+      <tr><td class="mono">6</td><td>Internet Protocol Version 4</td><td>Time to Live</td><td><input type="text" id="s-ttl" inputmode="numeric" autocomplete="off" aria-label="TTL in Frame 6"></td></tr>
+      <tr><td class="mono">8</td><td>Internet Protocol Version 4</td><td>Total Length</td><td><input type="text" id="s-len" inputmode="numeric" autocomplete="off" aria-label="Total Length in Frame 8"></td></tr>
+      <tr><td class="mono">8</td><td>Hypertext Transfer Protocol</td><td>Host</td><td><input type="text" id="s-host" autocomplete="off" aria-label="Host in Frame 8"></td></tr>
+      <tr><td class="mono">9</td><td>Hypertext Transfer Protocol</td><td>Content-Type</td><td><input type="text" id="s-ct" autocomplete="off" aria-label="Content-Type in Frame 9"></td></tr>
+    </table></div>
+    <div class="answer"><button class="check" data-check="steck">Prüfen</button></div>
+    <div class="msg" id="msg-steck"></div>
+  </div>
+</section>
+
+<!-- ================= AUFGABE 14 ================= -->
+<section class="task" id="ws4">
+  <div class="task-head">
+    <span class="num">Aufgabe 14</span>
+    <h2>Wem gehört was?</h2>
+  </div>
+  <div class="step">
+    <p>Im Mitschnitt tauchen immer wieder dieselben Werte auf. Finde heraus, zu wem sie gehören. Vergleiche dazu, in welchen Frames sie als Quelle und als Ziel stehen.</p>
+    <div class="scroll"><table class="own">
+      <tr><td class="lab mono">a4:5e:60:3b:91:0c</td><td><select id="v-mpc" aria-label="Besitzer von a4:5e:60:3b:91:0c"></select></td></tr>
+      <tr><td class="lab mono">74:da:88:5f:20:01</td><td><select id="v-mrt" aria-label="Besitzer von 74:da:88:5f:20:01"></select></td></tr>
+      <tr><td class="lab mono">ff:ff:ff:ff:ff:ff</td><td><select id="v-mbc" aria-label="Besitzer von ff:ff:ff:ff:ff:ff"></select></td></tr>
+      <tr><td class="lab mono">198.51.100.20</td><td><select id="v-isrv" aria-label="Besitzer von 198.51.100.20"></select></td></tr>
+      <tr><td class="lab mono">192.168.50.1</td><td><select id="v-irt" aria-label="Besitzer von 192.168.50.1"></select></td></tr>
+      <tr><td class="lab mono">49822</td><td><select id="v-p1" aria-label="Besitzer von 49822"></select></td></tr>
+      <tr><td class="lab mono">80</td><td><select id="v-p2" aria-label="Besitzer von 80"></select></td></tr>
+      <tr><td class="lab mono">53</td><td><select id="v-p3" aria-label="Besitzer von 53"></select></td></tr>
+    </table></div>
+    <div class="answer"><button class="check" data-check="wer">Prüfen</button></div>
+    <div class="msg" id="msg-wer"></div>
+  </div>
+</section>
+
+<!-- ================= AUFGABE 15 ================= -->
+<section class="task" id="ws5">
+  <div class="task-head">
+    <span class="num">Aufgabe 15</span>
+    <h2>Leer oder voll?</h2>
+  </div>
+  <div class="step">
+    <p>Nicht jeder Frame bringt etwas für Browser, Terminportal oder DNS-Dienst mit. Kreuze die Frames an, in denen Daten einer Anwendung stecken. Ein Blick in den Baum und in die Info-Spalte hilft.</p>
+    <div class="scroll"><table class="grid">
+      <tr><th>Frame</th><th class="mitte">3</th><th class="mitte">4</th><th class="mitte">5</th><th class="mitte">6</th><th class="mitte">7</th><th class="mitte">8</th><th class="mitte">9</th><th class="mitte">10</th><th class="mitte">11</th></tr>
+      <tr><td>Daten einer Anwendung</td><td class="mitte"><input type="checkbox" id="d-3" aria-label="Frame 3 trägt Daten einer Anwendung"></td><td class="mitte"><input type="checkbox" id="d-4" aria-label="Frame 4 trägt Daten einer Anwendung"></td><td class="mitte"><input type="checkbox" id="d-5" aria-label="Frame 5 trägt Daten einer Anwendung"></td><td class="mitte"><input type="checkbox" id="d-6" aria-label="Frame 6 trägt Daten einer Anwendung"></td><td class="mitte"><input type="checkbox" id="d-7" aria-label="Frame 7 trägt Daten einer Anwendung"></td><td class="mitte"><input type="checkbox" id="d-8" aria-label="Frame 8 trägt Daten einer Anwendung"></td><td class="mitte"><input type="checkbox" id="d-9" aria-label="Frame 9 trägt Daten einer Anwendung"></td><td class="mitte"><input type="checkbox" id="d-10" aria-label="Frame 10 trägt Daten einer Anwendung"></td><td class="mitte"><input type="checkbox" id="d-11" aria-label="Frame 11 trägt Daten einer Anwendung"></td></tr>
+    </table></div>
+    <div class="scroll" style="margin-top:12px"><table class="own">
+      <tr><td class="lab">Höchste OSI-Schicht, die in Frame 4 vorkommt</td><td><input type="text" id="h-4" inputmode="numeric" autocomplete="off" aria-label="Höchste Schicht Frame 4"></td></tr>
+      <tr><td class="lab">Höchste OSI-Schicht, die in Frame 7 vorkommt</td><td><input type="text" id="h-7" inputmode="numeric" autocomplete="off" aria-label="Höchste Schicht Frame 7"></td></tr>
+      <tr><td class="lab">Höchste OSI-Schicht, die in Frame 10 vorkommt</td><td><input type="text" id="h-10" inputmode="numeric" autocomplete="off" aria-label="Höchste Schicht Frame 10"></td></tr>
+      <tr><td class="lab">Vergleiche deine Antworten mit der Spalte Protocol. Wireshark trägt dort ein:</td><td><select id="h-spalte" aria-label="Was die Spalte Protocol zeigt"><option value=""></option><option value="erst">das Protokoll der untersten Schicht</option><option value="oben">das Protokoll der obersten Schicht, die im Frame steckt</option><option value="wichtig">das Protokoll mit dem größten Header</option><option value="zufall">immer das Transportprotokoll</option></select></td></tr>
+    </table></div>
+    <div class="answer"><button class="check" data-check="leer">Prüfen</button></div>
+    <div class="msg" id="msg-leer"></div>
+  </div>
+</section>
+
+<!-- ================= AUFGABE 16 ================= -->
+<section class="task" id="ws6">
+  <div class="task-head">
+    <span class="num">Aufgabe 16</span>
+    <h2>Unterwegs umgeschrieben</h2>
+  </div>
+  <div class="step">
+    <p>Frame 6 kommt vom Webserver im Internet. Auf seinem Weg in die Praxis wurde er mehrfach weitergereicht. Der Webserver schickt seine Pakete mit einer TTL von 64 los. Der Laptop hat eine private IP-Adresse. Im Internet ist die Praxis nur unter der öffentlichen IP-Adresse ihres Routers erreichbar.</p>
+    <div class="scroll"><table class="own">
+      <tr><td class="lab">Anzahl der Router zwischen Webserver und Laptop</td><td><input type="text" id="u-hops" inputmode="numeric" autocomplete="off" aria-label="Anzahl der Router"></td></tr>
+      <tr><td class="lab">Quell-MAC-Adresse</td><td><select id="u-qmac" aria-label="Quell-MAC-Adresse in Frame 6"><option value=""></option><option value="gleich">so, wie der Webserver es eingetragen hat</option><option value="neu">auf dem Weg von einem Router geändert</option></select></td></tr>
+      <tr><td class="lab">Ziel-MAC-Adresse</td><td><select id="u-zmac" aria-label="Ziel-MAC-Adresse in Frame 6"><option value=""></option><option value="gleich">so, wie der Webserver es eingetragen hat</option><option value="neu">auf dem Weg von einem Router geändert</option></select></td></tr>
+      <tr><td class="lab">Quell-IP-Adresse</td><td><select id="u-qip" aria-label="Quell-IP-Adresse in Frame 6"><option value=""></option><option value="gleich">so, wie der Webserver es eingetragen hat</option><option value="neu">auf dem Weg von einem Router geändert</option></select></td></tr>
+      <tr><td class="lab">Ziel-IP-Adresse</td><td><select id="u-zip" aria-label="Ziel-IP-Adresse in Frame 6"><option value=""></option><option value="gleich">so, wie der Webserver es eingetragen hat</option><option value="neu">auf dem Weg von einem Router geändert</option></select></td></tr>
+      <tr><td class="lab">Quellport</td><td><select id="u-qport" aria-label="Quellport in Frame 6"><option value=""></option><option value="gleich">so, wie der Webserver es eingetragen hat</option><option value="neu">auf dem Weg von einem Router geändert</option></select></td></tr>
+      <tr><td class="lab">Time to Live</td><td><select id="u-ttl" aria-label="Time to Live in Frame 6"><option value=""></option><option value="gleich">so, wie der Webserver es eingetragen hat</option><option value="neu">auf dem Weg von einem Router geändert</option></select></td></tr>
+    </table></div>
+    <div class="answer"><button class="check" data-check="weg">Prüfen</button></div>
+    <div class="msg" id="msg-weg"></div>
+  </div>
+</section>
+
+<!-- ================= AUFGABE 17 ================= -->
+<section class="task" id="ws7">
+  <div class="task-head">
+    <span class="num">Aufgabe 17</span>
+    <h2>Offen wie eine Postkarte</h2>
+  </div>
+  <div class="step">
+    <p>Jemand, der im WLAN der Praxis mitschneidet, sieht dieselben Frames wie du. Finde heraus, was er über die Patientin erfährt.</p>
+    <div class="scroll"><table class="own">
+      <tr><td class="lab">Name der Patientin</td><td><input type="text" id="o-name" autocomplete="off" aria-label="Name der Patientin"></td></tr>
+      <tr><td class="lab">Geburtsdatum der Patientin</td><td><input type="text" id="o-geb" autocomplete="off" aria-label="Geburtsdatum der Patientin"></td></tr>
+      <tr><td class="lab">Frame, in dem diese Angaben stehen</td><td><input type="text" id="o-frame" inputmode="numeric" autocomplete="off" aria-label="Frame mit den Angaben"></td></tr>
+      <tr><td class="lab">OSI-Schicht, zu der diese Angaben gehören</td><td><input type="text" id="o-schicht" inputmode="numeric" autocomplete="off" aria-label="Schicht der Angaben"></td></tr>
+    </table></div>
+    <div class="answer"><button class="check" data-check="post">Prüfen</button></div>
+    <div class="msg" id="msg-post"></div>
+    <p style="margin-top:12px">Die Praxisleitung meint: „Das WLAN hat doch ein Passwort. Da kann niemand mitlesen.“ Erkläre ihr, warum der Mitschnitt das Gegenteil zeigt und was den Daten fehlt.</p>
+    <div class="freitext" id="o-erkl" contenteditable="true" data-platzhalter="Deine Erklärung"></div>
   </div>
 </section>
 
@@ -1278,6 +1469,374 @@
   }
 })();
 </script>
+<script>
+(function(){
+  var PREFIX = "bsfi-wireshark:";
+  function $(id){ return document.getElementById(id); }
+  function say(k, text, kind){ var el = $("msg-" + k); el.textContent = text; el.className = "msg" + (kind ? " " + kind : ""); }
+  function mark(el, ok){ el.classList.remove("ok", "bad"); el.classList.add(ok ? "ok" : "bad"); }
+  function lade(k){ try { var s = localStorage.getItem(PREFIX + k); return s ? JSON.parse(s) : null; } catch (e) { return null; } }
+  function sichere(k, v){ try { localStorage.setItem(PREFIX + k, JSON.stringify(v)); } catch (e) {} }
+  function svgEl(tag, attrs, parent){
+    var e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+    for (var a in attrs) e.setAttribute(a, attrs[a]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  /* feste, aber je Feld unterschiedliche Reihenfolge der Optionen */
+  function mische(arr, seed){
+    var h = 0, i;
+    for (i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
+    var a = arr.slice();
+    for (i = a.length - 1; i > 0; i--){ h = (h * 1103515245 + 12345) >>> 0; var j = h % (i + 1); var t = a[i]; a[i] = a[j]; a[j] = t; }
+    return a;
+  }
+  function fuelle(sel, opts, seed){
+    var o = document.createElement("option"); o.value = ""; sel.appendChild(o);
+    (seed ? mische(opts, seed) : opts).forEach(function(p){ var op = document.createElement("option"); op.value = p[0]; op.textContent = p[1]; sel.appendChild(op); });
+  }
+
+  /* ---------- Prüfen (alle Felder, kein Abbruch am ersten Fehler) ---------- */
+  function kurz(name){ return name.replace(/^(Die|Der|Das) /, ""); }
+  function neu(){ return {fehlt:[], falsch:[], tipps:[]}; }
+  function tipp(r, t){ if (r.tipps.indexOf(t) < 0) r.tipps.push(t); }
+  var ERKL = {
+    wer: "MAC-Adressen gehören zu Netzwerkkarten im eigenen Netz, deshalb taucht vom Webserver nie eine MAC-Adresse auf. Alles, was ins Internet geht, wird an die MAC-Adresse des Routers geschickt. Ports gehören zu Programmen: Der Browser bekommt eine zufällige hohe Nummer, Dienste haben feste Nummern wie 80 und 53.",
+    leer: "Die Frames 5 bis 7 bauen nur die TCP-Verbindung auf und haben keine Nutzdaten (Len=0). Ihr höchster Teil ist TCP auf Schicht 4. DNS braucht keinen Verbindungsaufbau, schon die erste Frage trägt Daten. Wireshark schreibt in die Spalte Protocol immer das Protokoll der obersten Schicht.",
+    weg: "Jeder Router zieht eins von der TTL ab, 64 minus 52 ergibt zwölf Router. Jeder Router baut außerdem einen neuen Frame, deshalb stammen beide MAC-Adressen vom letzten Abschnitt. Quell-IP-Adresse und Quellport trägt der Webserver ein, sie kommen unverändert an. Die private Adresse des Laptops kennt der Webserver gar nicht, denn private Adressen werden im Internet nicht weitergeleitet. Er schickt an die öffentliche Adresse des Praxisrouters. Erst dieser Router setzt die private Adresse des Laptops als Ziel ein. Das nennt man NAT (Network Address Translation).",
+    post: "Der Browser schickt das Formular als Klartext auf Schicht 7. Das WLAN-Passwort hält nur Fremde draußen. Wer es kennt, zum Beispiel jedes Gerät im Praxisnetz, kann den Verkehr mitschneiden. Ohne Verschlüsselung der Anwendungsdaten (HTTPS) ist die Buchung offen wie eine Postkarte.",
+    filt: "Ein Filter fragt, ob ein Frame einen bestimmten Header oder Wert enthält. Weil jede Schicht in die darunter eingepackt ist, findet der Filter tcp auch die HTTP-Frames und der Filter ip auch alle TCP- und DNS-Frames. ARP-Frames haben keinen IP-Header und fallen beim Filter ip heraus.",
+    steck: "Jedes Feld steht in genau einem Header. Type im Ethernet-Header und Protocol im IP-Header sagen, welcher Header als Nächstes kommt. Total Length zählt nur IP-Header plus Inhalt, ohne den Ethernet-Header. Die TTL von 52 verrät, dass zwischen Server und Praxis zwölf Router liegen."
+  };
+  function melde(k, r){
+    var z = [];
+    if (r.falsch.length) z.push("Stimmt noch nicht: " + r.falsch.join(", ") + ".");
+    r.tipps.forEach(function(t){ z.push("Tipp: " + t); });
+    if (r.fehlt.length) z.push("Fehlt noch: " + r.fehlt.join(", ") + ".");
+    if (!z.length){ say(k, "Alles richtig. " + (ERKL[k] || ""), "ok"); return true; }
+    say(k, z.join("\n"), "hint");
+    return false;
+  }
+  function parse(s){
+    s = (s || "").replace(/\s+/g, "").replace(/[^0-9,.\-]/g, "");
+    if (s === "") return null;
+    if (s.indexOf(",") >= 0) s = s.replace(/\./g, "").replace(",", ".");
+    var n = Number(s);
+    return isNaN(n) ? NaN : n;
+  }
+  function pruefe(list, r){
+    list.forEach(function(f){
+      var el = $(f.id);
+      el.classList.remove("ok", "bad");
+      if (f.sel){
+        if (el.value === ""){ r.fehlt.push(kurz(f.name)); return; }
+        var okS = f.sel.indexOf(el.value) >= 0;
+        mark(el, okS);
+        if (!okS){ r.falsch.push(kurz(f.name)); if (f.tipp) tipp(r, f.tipp); }
+        return;
+      }
+      if (f.txt){
+        var t = el.value.trim();
+        if (t === ""){ r.fehlt.push(kurz(f.name)); return; }
+        var okT = f.txt(t);
+        mark(el, okT);
+        if (!okT){ r.falsch.push(kurz(f.name)); (f.hints || []).some(function(h){ if (h[0](t)){ tipp(r, h[1]); return true; } return false; }); }
+        return;
+      }
+      var v = parse(el.value);
+      if (v === null){ r.fehlt.push(kurz(f.name)); return; }
+      if (isNaN(v)){ mark(el, false); r.falsch.push(kurz(f.name) + " (keine Zahl)"); return; }
+      var ok = Math.abs(v - f.soll) <= f.tol;
+      mark(el, ok);
+      if (!ok){ r.falsch.push(kurz(f.name)); (f.hints || []).some(function(h){ if (Math.abs(v - h[0]) <= h[1]){ tipp(r, h[2]); return true; } return false; }); }
+    });
+    return r;
+  }
+
+  /* =================== AUFGABE 5: Mitschnitt =================== */
+  function macB(s){ return s.split(":").map(function(h){ return parseInt(h, 16); }); }
+  function ipB(s){ return s.split(".").map(Number); }
+  function u16(n){ return [(n >> 8) & 255, n & 255]; }
+  function u32(n){ return [(n >>> 24) & 255, (n >>> 16) & 255, (n >>> 8) & 255, n & 255]; }
+  function ascii(s){ var a = []; for (var i = 0; i < s.length; i++) a.push(s.charCodeAt(i)); return a; }
+  function summe(b){ var s = 0; for (var i = 0; i < b.length; i += 2) s += (b[i] << 8) + (b[i + 1] || 0); while (s >> 16) s = (s & 0xffff) + (s >> 16); return (~s) & 0xffff; }
+  function hex2(n){ return ("0" + n.toString(16)).slice(-2); }
+  function hex4(n){ return "0x" + ("000" + n.toString(16)).slice(-4); }
+
+
+  var M = {pc:"a4:5e:60:3b:91:0c", rt:"74:da:88:5f:20:01", bc:"ff:ff:ff:ff:ff:ff", nul:"00:00:00:00:00:00"};
+  var IP = {pc:"192.168.50.12", rt:"192.168.50.1", srv:"198.51.100.20"};
+  var NAME = "termine.praxis-hahn.example", DNS_ID = 0x4f1d;
+  var CP = 49822, ISN_C = 0x2c1d0e9f, ISN_S = 0x7b3a5c10;
+  var GET = "GET /termine?tag=montag HTTP/1.1\r\nHost: " + NAME + "\r\nUser-Agent: Mozilla/5.0 (Windows NT 10.0)\r\nAccept: text/html\r\n\r\n";
+  var BODY = "<html><body><h1>Freie Termine</h1><p>Montag 10:30</p></body></html>";
+  var FORM = "name=Lena+Kraus&geburtsdatum=12.04.1990&termin=montag-1030";
+  var POST = "POST /buchen HTTP/1.1\r\nHost: " + NAME + "\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: " + FORM.length + "\r\n\r\n" + FORM;
+  var BODY2 = "<html><body><h1>Termin gebucht</h1><p>Montag 10:30</p></body></html>";
+  var RESP2 = "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nContent-Length: " + BODY2.length + "\r\n\r\n" + BODY2;
+  var RESP = "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nContent-Length: " + BODY.length + "\r\n\r\n" + BODY;
+
+  function ethernet(dst, src, typ){
+    var b = macB(dst).concat(macB(src), u16(typ));
+    return {b:b, n:{t:"Ethernet II, Src: " + src + ", Dst: " + dst, s:0, l:14, k:[
+      {t:"Destination: " + dst, s:0, l:6}, {t:"Source: " + src, s:6, l:6}, {t:"Type: " + (typ === 0x0806 ? "ARP" : "IPv4") + " (" + hex4(typ) + ")", s:12, l:2}]}};
+  }
+  function arpFrame(op, sha, spa, tha, tpa, edst){
+    var e = ethernet(edst, sha, 0x0806);
+    var a = [0,1, 8,0, 6, 4].concat(u16(op), macB(sha), ipB(spa), macB(tha), ipB(tpa));
+    var o = 14;
+    return {b:e.b.concat(a), baum:[e.n, {t:"Address Resolution Protocol (" + (op === 1 ? "request" : "reply") + ")", s:o, l:28, k:[
+      {t:"Hardware type: Ethernet (1)", s:o, l:2}, {t:"Protocol type: IPv4 (0x0800)", s:o + 2, l:2},
+      {t:"Opcode: " + (op === 1 ? "request (1)" : "reply (2)"), s:o + 6, l:2},
+      {t:"Sender MAC address: " + sha, s:o + 8, l:6}, {t:"Sender IP address: " + spa, s:o + 14, l:4},
+      {t:"Target MAC address: " + tha, s:o + 18, l:6}, {t:"Target IP address: " + tpa, s:o + 24, l:4}]}]};
+  }
+  function ipKopf(src, dst, ttl, proto, id, tot){
+    var iph = [0x45, 0].concat(u16(tot), u16(id), [0x40, 0, ttl, proto, 0, 0], ipB(src), ipB(dst));
+    var c = summe(iph); iph[10] = c >> 8; iph[11] = c & 255;
+    var o = 14;
+    return {b:iph, n:{t:"Internet Protocol Version 4, Src: " + src + ", Dst: " + dst, s:o, l:20, k:[
+      {t:"Version: 4", s:o, l:1}, {t:"Total Length: " + tot, s:o + 2, l:2}, {t:"Identification: " + hex4(id), s:o + 4, l:2},
+      {t:"Time to Live: " + ttl, s:o + 8, l:1}, {t:"Protocol: " + (proto === 6 ? "TCP (6)" : "UDP (17)"), s:o + 9, l:1}, {t:"Header Checksum: " + hex4(c), s:o + 10, l:2},
+      {t:"Source Address: " + src, s:o + 12, l:4}, {t:"Destination Address: " + dst, s:o + 16, l:4}]}};
+  }
+  var FLAGNAMEN = {0x02:"SYN", 0x12:"SYN, ACK", 0x10:"ACK", 0x18:"PSH, ACK"};
+  function tcpFrame(vonC, flags, seq, ack, nutz, id){
+    var src = vonC ? IP.pc : IP.srv, dst = vonC ? IP.srv : IP.pc;
+    var sp = vonC ? CP : 80, dp = vonC ? 80 : CP, ttl = vonC ? 64 : 52, win = vonC ? 64240 : 29200;
+    var e = vonC ? ethernet(M.rt, M.pc, 0x0800) : ethernet(M.pc, M.rt, 0x0800);
+    var data = ascii(nutz || ""), ip = ipKopf(src, dst, ttl, 6, id, 40 + data.length);
+    var tcph = u16(sp).concat(u16(dp), u32(seq >>> 0), u32(ack >>> 0), [0x50, flags], u16(win), [0, 0, 0, 0]);
+    var tc = summe(ipB(src).concat(ipB(dst), [0, 6], u16(20 + data.length), tcph, data)); tcph[16] = tc >> 8; tcph[17] = tc & 255;
+    var t = 34;
+    var baum = [e.n, ip.n, {t:"Transmission Control Protocol, Src Port: " + sp + ", Dst Port: " + dp, s:t, l:20, k:[
+      {t:"Source Port: " + sp, s:t, l:2}, {t:"Destination Port: " + dp, s:t + 2, l:2},
+      {t:"Sequence Number (raw): " + (seq >>> 0), s:t + 4, l:4}, {t:"Acknowledgment Number (raw): " + (ack >>> 0), s:t + 8, l:4},
+      {t:"Flags: " + hex4(flags).replace("0x00", "0x0") + " (" + FLAGNAMEN[flags] + ")", s:t + 13, l:1}, {t:"Window: " + win, s:t + 14, l:2},
+      {t:"Checksum: " + hex4(tc), s:t + 16, l:2}]}];
+    if (data.length){
+      var zeilen = [], pos = 54, form = null;
+      nutz.split("\r\n").forEach(function(z, i, arr){
+        if (i === arr.length - 1 && z === "") return;
+        var len = z.length + (i < arr.length - 1 ? 2 : 0);
+        if (z === "") zeilen.push({t:"\\r\\n", s:pos, l:len});
+        else if (z.charAt(0) === "<") zeilen.push({t:"Line-based text data: text/html", s:pos, l:len});
+        else if (i === arr.length - 1 && z.indexOf("=") > 0 && z.indexOf(":") < 0){
+          var items = [], q = pos;
+          z.split("&").forEach(function(it){ var kv = it.split("="); items.push({t:"Form item: \"" + kv[0] + "\" = \"" + decodeURIComponent(kv[1].replace(/\+/g, " ")) + "\"", s:q, l:it.length}); q += it.length + 1; });
+          form = {t:"HTML Form URL Encoded: application/x-www-form-urlencoded", s:pos, l:len, k:items};
+        }
+        else zeilen.push({t:z + "\\r\\n", s:pos, l:len});
+        pos += len;
+      });
+      baum.push({t:"Hypertext Transfer Protocol", s:54, l:form ? form.s - 54 : data.length, k:zeilen});
+      if (form) baum.push(form);
+    }
+    return {b:e.b.concat(ip.b, tcph, data), baum:baum};
+  }
+  function dnsName(n){ var b = []; n.split(".").forEach(function(t){ b.push(t.length); b = b.concat(ascii(t)); }); b.push(0); return b; }
+  function dnsFrame(antwort, id){
+    var src = antwort ? IP.rt : IP.pc, dst = antwort ? IP.pc : IP.rt, sp = antwort ? 53 : 50133, dp = antwort ? 50133 : 53;
+    var e = antwort ? ethernet(M.pc, M.rt, 0x0800) : ethernet(M.rt, M.pc, 0x0800);
+    var frage = dnsName(NAME).concat(u16(1), u16(1));
+    var dns = u16(DNS_ID).concat(u16(antwort ? 0x8180 : 0x0100), u16(1), u16(antwort ? 1 : 0), u16(0), u16(0), frage);
+    var antw = [0xc0, 0x0c].concat(u16(1), u16(1), u32(3600), u16(4), ipB(IP.srv));
+    if (antwort) dns = dns.concat(antw);
+    var ulen = 8 + dns.length, ip = ipKopf(src, dst, 64, 17, id, 20 + ulen);
+    var udph = u16(sp).concat(u16(dp), u16(ulen), [0, 0]);
+    var uc = summe(ipB(src).concat(ipB(dst), [0, 17], u16(ulen), udph, dns)); udph[6] = uc >> 8; udph[7] = uc & 255;
+    var t = 34, d = 42, q = d + 12;
+    var dk = [{t:"Transaction ID: " + hex4(DNS_ID), s:d, l:2}, {t:"Flags: " + hex4(antwort ? 0x8180 : 0x0100) + (antwort ? " Standard query response, No error" : " Standard query"), s:d + 2, l:2},
+      {t:"Questions: 1", s:d + 4, l:2}, {t:"Answer RRs: " + (antwort ? 1 : 0), s:d + 6, l:2},
+      {t:"Queries", s:q, l:frage.length, k:[{t:NAME + ": type A, class IN", s:q, l:frage.length}]}];
+    if (antwort) dk.push({t:"Answers", s:q + frage.length, l:antw.length, k:[{t:NAME + ": type A, class IN, addr " + IP.srv, s:q + frage.length, l:antw.length}]});
+    var baum = [e.n, ip.n,
+      {t:"User Datagram Protocol, Src Port: " + sp + ", Dst Port: " + dp, s:t, l:8, k:[
+        {t:"Source Port: " + sp, s:t, l:2}, {t:"Destination Port: " + dp, s:t + 2, l:2}, {t:"Length: " + ulen, s:t + 4, l:2}, {t:"Checksum: " + hex4(uc), s:t + 6, l:2}]},
+      {t:"Domain Name System (" + (antwort ? "response" : "query") + ")", s:d, l:dns.length, k:dk}];
+    return {b:e.b.concat(ip.b, udph, dns), baum:baum};
+  }
+  var FRAMES = [
+    {src:M.pc, dst:M.bc, p:"ARP", info:"Who has " + IP.rt + "? Tell " + IP.pc, f:arpFrame(1, M.pc, IP.pc, M.nul, IP.rt, M.bc)},
+    {src:M.rt, dst:M.pc, p:"ARP", info:IP.rt + " is at " + M.rt, f:arpFrame(2, M.rt, IP.rt, M.pc, IP.pc, M.pc)},
+    {src:IP.pc, dst:IP.rt, p:"DNS", info:"Standard query " + hex4(DNS_ID) + " A " + NAME, f:dnsFrame(false, 0x6a01)},
+    {src:IP.rt, dst:IP.pc, p:"DNS", info:"Standard query response " + hex4(DNS_ID) + " A " + NAME + " A " + IP.srv, f:dnsFrame(true, 0x0c55)},
+    {src:IP.pc, dst:IP.srv, p:"TCP", info:CP + " → 80 [SYN] Seq=0 Win=64240 Len=0", f:tcpFrame(true, 0x02, ISN_C, 0, "", 0x6a02)},
+    {src:IP.srv, dst:IP.pc, p:"TCP", info:"80 → " + CP + " [SYN, ACK] Seq=0 Ack=1 Win=29200 Len=0", f:tcpFrame(false, 0x12, ISN_S, ISN_C + 1, "", 0x0000)},
+    {src:IP.pc, dst:IP.srv, p:"TCP", info:CP + " → 80 [ACK] Seq=1 Ack=1 Win=64240 Len=0", f:tcpFrame(true, 0x10, ISN_C + 1, ISN_S + 1, "", 0x6a03)},
+    {src:IP.pc, dst:IP.srv, p:"HTTP", info:"GET /termine?tag=montag HTTP/1.1", f:tcpFrame(true, 0x18, ISN_C + 1, ISN_S + 1, GET, 0x6a04)},
+    {src:IP.srv, dst:IP.pc, p:"HTTP", info:"HTTP/1.1 200 OK  (text/html)", f:tcpFrame(false, 0x18, ISN_S + 1, ISN_C + 1 + GET.length, RESP, 0xd3e1)},
+    {src:IP.pc, dst:IP.srv, p:"HTTP", info:"POST /buchen HTTP/1.1  (application/x-www-form-urlencoded)", f:tcpFrame(true, 0x18, ISN_C + 1 + GET.length, ISN_S + 1 + RESP.length, POST, 0x6a05)},
+    {src:IP.srv, dst:IP.pc, p:"HTTP", info:"HTTP/1.1 200 OK  (text/html)", f:tcpFrame(false, 0x18, ISN_S + 1 + RESP.length, ISN_C + 1 + GET.length + POST.length, RESP2, 0xd3e2)}
+  ];
+  /* Eckdaten je Frame direkt aus den Bytes lesen */
+  function macS(b, i){ return b.slice(i, i + 6).map(hex2).join(":"); }
+  FRAMES.forEach(function(fr, i){
+    var b = fr.f.b, typ = (b[12] << 8) + b[13], m = {p:{eth:true}, f:{"frame.number":[i + 1], "eth.src":[macS(b, 6)], "eth.dst":[macS(b, 0)]}};
+    m.f["eth.addr"] = m.f["eth.src"].concat(m.f["eth.dst"]);
+    if (typ === 0x0806) m.p.arp = true;
+    if (typ === 0x0800){
+      var ip = function(k){ return b.slice(k, k + 4).join("."); }, pr = b[23], tot = (b[16] << 8) + b[17];
+      m.p.ip = true;
+      m.f["ip.src"] = [ip(26)]; m.f["ip.dst"] = [ip(30)]; m.f["ip.addr"] = [ip(26), ip(30)]; m.f["ip.ttl"] = [b[22]];
+      var sp = (b[34] << 8) + b[35], dp = (b[36] << 8) + b[37];
+      var l4 = pr === 6 ? "tcp" : (pr === 17 ? "udp" : null);
+      if (l4){ m.p[l4] = true; m.f[l4 + ".srcport"] = [sp]; m.f[l4 + ".dstport"] = [dp]; m.f[l4 + ".port"] = [sp, dp]; }
+      if (l4 === "tcp" && tot > 40) m.p.http = true;
+      if (l4 === "udp" && (sp === 53 || dp === 53)) m.p.dns = true;
+    }
+    fr.meta = m;
+  });
+  function wfNorm(v){ return String(v).toLowerCase().replace(/[:\-]/g, "").replace(/^0+(?=\d)/, ""); }
+  /* kleiner Parser: or / and / not, Klammern, Feld == Wert, Protokollnamen */
+  function wfParse(text){
+    var tok = text.match(/==|!=|&&|\|\||!|\(|\)|[^\s()!=&|]+/g);
+    if (!tok) return null;
+    var pos = 0;
+    function peek(){ return tok[pos]; }
+    function weiter(){ return tok[pos++]; }
+    function oder(){ var l = und(); if (!l) return null; while (peek() === "or" || peek() === "||"){ weiter(); var r = und(); if (!r) return null; l = (function(a, b){ return function(m){ return a(m) || b(m); }; })(l, r); } return l; }
+    function und(){ var l = nicht(); if (!l) return null; while (peek() === "and" || peek() === "&&"){ weiter(); var r = nicht(); if (!r) return null; l = (function(a, b){ return function(m){ return a(m) && b(m); }; })(l, r); } return l; }
+    function nicht(){
+      if (peek() === "not" || peek() === "!"){ weiter(); var x = nicht(); return x ? function(m){ return !x(m); } : null; }
+      if (peek() === "("){ weiter(); var e = oder(); if (!e || weiter() !== ")") return null; return e; }
+      var w = weiter(); if (!w) return null; w = w.toLowerCase();
+      if (["eth","arp","ip","tcp","udp","dns","http"].indexOf(w) >= 0 && ["==","!=","eq","ne"].indexOf(peek()) < 0) return function(m){ return !!m.p[w]; };
+      var felder = ["eth.src","eth.dst","eth.addr","ip.src","ip.dst","ip.addr","ip.ttl","tcp.port","tcp.srcport","tcp.dstport","udp.port","udp.srcport","udp.dstport"];
+      if (felder.indexOf(w) < 0) return null;
+      var op = weiter(); if (["==","!=","eq","ne"].indexOf(op) < 0) return null;
+      var wert = weiter(); if (!wert) return null; wert = wfNorm(wert);
+      var gleich = op === "==" || op === "eq";
+      return function(m){ var v = m.f[w]; if (!v) return false; var hit = v.some(function(x){ return wfNorm(x) === wert; }); return gleich ? hit : !hit; };
+    }
+    var fn = oder();
+    return fn && pos === tok.length ? fn : null;
+  }
+  function wfTreffer(text){ var fn = wfParse(text); if (!fn) return null; var t = []; FRAMES.forEach(function(fr, i){ if (fn(fr.meta)) t.push(i + 1); }); return t; }
+  function wfSoll(soll){ return function(t){ var r = wfTreffer(t); return !!r && r.join() === soll.join(); }; }
+  function wfHinweis(soll){ return [[function(t){ return wfTreffer(t) === null; }, "Mindestens ein Filter ist ungültig. Probiere ihn erst oben in der Filterzeile aus, dort wird er grün, wenn Wireshark ihn versteht."],
+    [function(){ return true; }, "Teste deine Filter oben in der Filterzeile und vergleiche, welche Frames übrig bleiben."]]; }
+  var wtb = document.querySelector("#wire-tab tbody");
+  FRAMES.forEach(function(fr, i){
+    var tr = document.createElement("tr"); tr.className = "p-" + fr.p.toLowerCase();
+    [i + 1, fr.src, fr.dst, fr.p, fr.f.b.length, fr.info].forEach(function(c){ var td = document.createElement("td"); td.textContent = c; tr.appendChild(td); });
+    tr.addEventListener("click", function(){ waehleFrame(i); });
+    wtb.appendChild(tr);
+  });
+  var byteEls = [], knoten = [];
+  function waehleFrame(i){
+    Array.prototype.forEach.call(wtb.children, function(tr, j){ tr.classList.toggle("sel", j === i); });
+    var fr = FRAMES[i];
+    knoten = [];
+    var baum = $("baum"); baum.innerHTML = "";
+    var wurzel = [{t:"Frame " + (i + 1) + ": " + fr.f.b.length + " bytes on wire (" + fr.f.b.length * 8 + " bits)", s:0, l:fr.f.b.length}].concat(fr.f.baum);
+    function bau(liste, parent, tiefe){
+      var ul = document.createElement("ul");
+      liste.forEach(function(n){
+        var li = document.createElement("li"), d = document.createElement("div");
+        var pf = document.createElement("span"); pf.className = "pf"; pf.textContent = n.k ? "▸" : "";
+        d.appendChild(pf); d.appendChild(document.createTextNode(n.t));
+        li.appendChild(d);
+        if (n.k){ li.className = "zu"; bau(n.k, li, tiefe + 1); }
+        n.el = d; n.li = li; n.tiefe = tiefe; knoten.push(n);
+        d.addEventListener("click", function(){
+          if (n.k){ li.classList.toggle("zu"); pf.textContent = li.classList.contains("zu") ? "▸" : "▾"; }
+          markiere(n);
+        });
+        ul.appendChild(li);
+      });
+      parent.appendChild(ul);
+    }
+    bau(wurzel, baum, 0);
+    var hex = $("hex"); hex.innerHTML = ""; byteEls = [];
+    var b = fr.f.b;
+    for (var z = 0; z < b.length; z += 16){
+      var off = document.createElement("span"); off.className = "off"; off.textContent = ("000" + z.toString(16)).slice(-4) + "  "; hex.appendChild(off);
+      var asc = "";
+      for (var j = z; j < z + 16; j++){
+        if (j < b.length){
+          var s = document.createElement("span"); s.className = "b"; s.textContent = hex2(b[j]); s.dataset.i = j;
+          s.addEventListener("click", function(ev){ klickByte(Number(ev.target.dataset.i)); });
+          hex.appendChild(s); byteEls.push(s);
+          asc += (b[j] >= 32 && b[j] < 127) ? String.fromCharCode(b[j]) : ".";
+        } else hex.appendChild(document.createTextNode("  "));
+        hex.appendChild(document.createTextNode(j === z + 7 ? "  " : " "));
+      }
+      var a = document.createElement("span"); a.className = "asc"; a.textContent = " " + asc; hex.appendChild(a);
+      hex.appendChild(document.createTextNode("\n"));
+    }
+  }
+  function markiere(n){
+    knoten.forEach(function(k){ k.el.classList.toggle("hl", k === n); });
+    byteEls.forEach(function(e, i){ e.classList.toggle("hl", i >= n.s && i < n.s + n.l); });
+  }
+  function klickByte(i){
+    var best = null;
+    knoten.forEach(function(n){ if (i >= n.s && i < n.s + n.l && (!best || n.tiefe > best.tiefe || (n.tiefe === best.tiefe && n.l < best.l))) best = n; });
+    if (!best) return;
+    var li = best.li.parentNode;
+    while (li && li.id !== "baum"){ if (li.tagName === "LI" && li.classList.contains("zu")){ li.classList.remove("zu"); li.firstChild.firstChild.textContent = "▾"; } li = li.parentNode; }
+    markiere(best);
+  }
+  waehleFrame(0);
+  var wfIn = $("w-filter");
+  wfIn.addEventListener("input", function(){
+    var t = wfIn.value.trim(), rows = wtb.children;
+    wfIn.classList.remove("gueltig", "ungueltig");
+    if (t === ""){ Array.prototype.forEach.call(rows, function(r){ r.hidden = false; }); $("w-filter-info").textContent = ""; return; }
+    var fn = wfParse(t);
+    if (!fn){ wfIn.classList.add("ungueltig"); $("w-filter-info").textContent = "ungültiger Filter"; Array.prototype.forEach.call(rows, function(r){ r.hidden = false; }); return; }
+    wfIn.classList.add("gueltig");
+    var n = 0;
+    FRAMES.forEach(function(fr, i){ var an = fn(fr.meta); rows[i].hidden = !an; if (an) n++; });
+    $("w-filter-info").textContent = "Angezeigt: " + n + " von " + FRAMES.length;
+  });
+
+  /* =================== Prüfdaten =================== */
+  var CHECKS = {
+    filt: [{id:"f-arp", txt:wfSoll([1,2]), name:"Der Filter für ARP", hints:wfHinweis()},
+           {id:"f-ip", txt:wfSoll([3,4,5,6,7,8,9,10,11]), name:"Der Filter für den IP-Header", hints:wfHinweis()},
+           {id:"f-dns", txt:wfSoll([3,4]), name:"Der Filter für DNS", hints:wfHinweis()},
+           {id:"f-srv", txt:wfSoll([6,9,11]), name:"Der Filter für Frames vom Webserver", hints:[[function(t){ var r = wfTreffer(t); return !!r && r.indexOf(5) >= 0; }, "Frame 5 schickt der Laptop. Gesucht sind nur die Frames, die der Webserver abschickt."]].concat(wfHinweis())},
+           {id:"f-rt", txt:wfSoll([3,5,7,8,10]), name:"Der Filter für Frames an den Router", hints:[[function(t){ var r = wfTreffer(t); return !!r && r.indexOf(1) >= 0; }, "Frame 1 geht an alle (Broadcast), nicht an den Router."], [function(t){ var r = wfTreffer(t); return !!r && (r.indexOf(4) >= 0 || r.indexOf(6) >= 0); }, "Gesucht ist nur die Richtung vom Laptop zum Router."]].concat(wfHinweis())},
+           {id:"f-warum", sel:["kaps"], name:"Der Grund für die HTTP-Frames", tipp:"Denk an die Kapselung: Was steckt in einem Frame mit HTTP noch alles drin?"}],
+    steck: [{id:"s-typ", txt:function(t){ t = t.toLowerCase(); return t.indexOf("arp") >= 0 || t.indexOf("0806") >= 0; }, name:"Type in Frame 1"},
+            {id:"s-proto", txt:function(t){ t = t.toLowerCase(); return t.indexOf("udp") >= 0 || t.replace(/\D/g, "") === "17"; }, name:"Protocol in Frame 3"},
+            {id:"s-addr", txt:function(t){ return t.replace(/\s/g, "") === IP.srv; }, name:"Die Antwortadresse in Frame 4", hints:[[function(t){ return t.replace(/\s/g, "") === IP.rt; }, "Das ist der Router, der die Antwort schickt. Gesucht ist die Adresse, die in der Antwort steht."]]},
+            {id:"s-flags", txt:function(t){ return t.toLowerCase().replace(/[^a-z]/g, "") === "syn"; }, name:"Flags in Frame 5", hints:[[function(t){ return t.toLowerCase().indexOf("ack") >= 0; }, "SYN, ACK steht in Frame 6. Gefragt ist Frame 5."]]},
+            {id:"s-ttl", soll:52, tol:0, name:"TTL in Frame 6", hints:[[64, 0, "64 ist die TTL des Laptops. Frame 6 kommt vom Webserver."]]},
+            {id:"s-len", soll:40 + GET.length, tol:0, name:"Total Length in Frame 8", hints:[[54 + GET.length, 0, "Das ist die Länge des ganzen Frames. Total Length zählt erst ab dem IP-Header."]]},
+            {id:"s-host", txt:function(t){ return t.trim().toLowerCase() === NAME; }, name:"Host in Frame 8"},
+            {id:"s-ct", txt:function(t){ return t.toLowerCase().indexOf("text/html") >= 0; }, name:"Content-Type in Frame 9"}]
+  };
+  var BESITZER = [["laptop","dem Laptop"],["router","dem Router"],["server","dem Webserver"],["alle","allen Geräten im Netz"],["browser","dem Browser auf dem Laptop"],["web","dem Webdienst auf dem Webserver"],["dnsd","dem DNS-Dienst auf dem Router"]];
+  var WER_SOLL = {"v-mpc":"laptop","v-mrt":"router","v-mbc":"alle","v-isrv":"server","v-irt":"router","v-p1":"browser","v-p2":"web","v-p3":"dnsd"};
+  Object.keys(WER_SOLL).forEach(function(id){ fuelle($(id), BESITZER, id); });
+  CHECKS.wer = Object.keys(WER_SOLL).map(function(id){ return {id:id, sel:[WER_SOLL[id]], name:"Der Wert " + $(id).getAttribute("aria-label").replace("Besitzer von ", "")}; });
+  CHECKS.leer = [{id:"h-4", soll:7, tol:0, name:"Die höchste Schicht in Frame 4", hints:[[4, 0, "Unter UDP steckt in Frame 4 noch ein weiterer Teil. Klappe den Baum ganz auf."]]},
+                 {id:"h-7", soll:4, tol:0, name:"Die höchste Schicht in Frame 7", hints:[[7, 0, "Frame 7 hat keinen Teil oberhalb von TCP."]]},
+                 {id:"h-10", soll:7, tol:0, name:"Die höchste Schicht in Frame 10"},
+                 {id:"h-spalte", sel:["oben"], name:"Die Bedeutung der Spalte Protocol"}];
+  CHECKS.weg = [{id:"u-hops", soll:12, tol:0, name:"Die Anzahl der Router", hints:[[52, 0, "52 ist die TTL, mit der der Frame ankommt. Wie viel hat der Weg davon abgezogen?"]]}].concat(
+    [["u-qmac","neu"],["u-zmac","neu"],["u-qip","gleich"],["u-zip","neu"],["u-qport","gleich"],["u-ttl","neu"]].map(function(x){ return {id:x[0], sel:[x[1]], name:"Die " + $(x[0]).getAttribute("aria-label").replace(" in Frame 6", "")}; }));
+  CHECKS.post = [{id:"o-name", txt:function(t){ return t.toLowerCase().replace(/[^a-zäöü]/g, "") === "lenakraus"; }, name:"Der Name", hints:[[function(t){ return t.indexOf("+") >= 0; }, "Das + steht in Formulardaten für ein Leerzeichen."]]},
+                 {id:"o-geb", txt:function(t){ return t.replace(/\s/g, "") === "12.04.1990"; }, name:"Das Geburtsdatum"},
+                 {id:"o-frame", soll:10, tol:0, name:"Der Frame"},
+                 {id:"o-schicht", soll:7, tol:0, name:"Die Schicht", hints:[[4, 0, "TCP transportiert die Angaben nur. Wem gehören sie?"]]}];
+  function pruefeLeer(){
+    var r = pruefe(CHECKS.leer, neu()), soll = [3,4,8,9,10,11], falsch = [];
+    var keins = true; for (var m = 3; m <= 11; m++) if ($("d-" + m).checked) keins = false;
+    if (keins){ r.fehlt.unshift("die Kreuze"); return r; }
+    for (var n = 3; n <= 11; n++){ var cb = $("d-" + n), ok = cb.checked === (soll.indexOf(n) >= 0); mark(cb.parentNode, ok); if (!ok) falsch.push(n); }
+    if (falsch.length){ r.falsch.unshift("die Kreuze bei Frame " + falsch.join(", ")); if (falsch.some(function(n){ return n >= 5 && n <= 7; })) tipp(r, "Achte bei den TCP-Frames in der Info-Spalte auf Len=."); if (falsch.indexOf(3) >= 0 || falsch.indexOf(4) >= 0) tipp(r, "Auch eine DNS-Frage und ihre Antwort sind Daten einer Anwendung."); }
+    return r;
+  }
+  Array.prototype.forEach.call(document.querySelectorAll("button.check"), function(b){
+    var k0 = b.getAttribute("data-check"); if (!CHECKS[k0] && k0 !== "leer") return;
+    b.addEventListener("click", function(){ var k = b.getAttribute("data-check"); melde(k, k === "leer" ? pruefeLeer() : pruefe(CHECKS[k], neu())); });
+  });
+})();
+</script>
 <!-- vt-speicher -->
 <style>
 .vt-tools{max-width:980px;margin:8px auto 40px;padding:0 22px;display:flex;gap:12px;flex-wrap:wrap}
@@ -1289,7 +1848,7 @@
 <script>
 (function(){
   var PREFIX = 'bsfi-uebung-subnetting:';
-  var EXCLUDE = '';
+  var EXCLUDE = '#w-filter';
   var TOGGLES = '';
   var WIPE_ID = '';
   var store = null;
